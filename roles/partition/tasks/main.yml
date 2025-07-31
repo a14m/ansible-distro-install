@@ -1,0 +1,99 @@
+---
+- name: "Ensure partition_swap is defined"
+  ansible.builtin.set_fact:
+    partition_swap: "{{ partition_swap | default({'name': 'default-swap'}) }}"
+
+- name: "Set partition_list"
+  ansible.builtin.set_fact:
+    partition_list: >-
+      {{
+        ([partition_boot, partition_swap, partition_root] + partition_extras)
+        | rejectattr('num', 'undefined')
+        | sort(attribute="num")
+      }}
+
+- name: "Show partition_list"
+  ansible.builtin.debug:
+    msg: "{{ partition_list }}"
+
+- name: "Erase device: {{ partition_disk }}"
+  ansible.builtin.command:
+    cmd: "wipefs -af {{ partition_disk }}"
+  when: partition_wipe
+  changed_when: true
+
+- name: "Run swapoff {{ partition_swap.dev }}"
+  # Ensure unmounting swap partition as it's mounted using swapon
+  ansible.builtin.command:
+    cmd: "swapoff {{ partition_swap.dev }}"
+  changed_when: true
+  failed_when: false
+  when: partition_swap.dev is defined
+
+- name: "Ensure partitions are not mounted"
+  ansible.posix.mount:
+    path: "{{ item.mount_path | default('') }}"
+    state: "unmounted"
+  # Ensure the /mnt/path is unmounted before /mnt (respect mount tree)
+  # This ensures not getting error device is busy when unmounting
+  # Ignore partitions without mount_path
+  with_items: "{{
+    partition_list
+    | rejectattr('mount_path', 'undefined')
+    | sort(attribute='mount_path')
+    | reverse
+  }}"
+
+- name: "Partition device: {{ partition_disk }}"
+  community.general.parted:
+    device: "{{ partition_disk }}"
+    number: "{{ item.num }}"
+    name: "{{ item.name }}"
+    label: "{{ item.label | default('gpt') }}"
+    flags: "{{ item.flags | default([]) }}"
+    part_start: "{{ item.part_start }}"
+    part_end: "{{ item.part_end }}"
+    state: "present"
+  with_items: "{{ partition_list }}"
+
+- name: "Create filesystem on device: {{ partition_disk }}"
+  community.general.filesystem:
+    dev: "{{ item.dev }}"
+    fstype: "{{ item.fstype }}"
+    opts: "{{ item.fstype_opts | default(omit) }}"
+    # For swap partiton and root partitions, always force recreation of the filesystem
+    # For any other partition, only create the filesystem if partition_wipe is true
+    # This is done to ensure that new install a distro won't affect other already installed systems.
+    force: "{{ (item.name in [partition_swap.name, partition_root.name]) | ternary(true, partition_wipe) }}"
+  with_items: "{{ partition_list }}"
+
+- name: "Run mkswap"
+  ansible.builtin.command:
+    cmd: "mkswap {{ partition_swap.dev }}"
+  changed_when: true
+  when: partition_swap.dev is defined
+
+- name: "Run swapon {{ partition_swap.dev }}"
+  ansible.builtin.command:
+    cmd: "swapon {{ partition_swap.dev }}"
+  changed_when: true
+  when: partition_swap.dev is defined
+
+- name: "Mount partitions"
+  ansible.posix.mount:
+    src: "{{ item.dev }}"
+    path: "{{ item.mount_path }}"
+    fstype: "{{ item.fstype }}"
+    opts: "{{ item.fstab_opts | default('defaults') }}"
+    state: "mounted"
+  # Ignore mounting partitions without mount_path
+  when: not (item.mount_path is undefined)
+  # Ignore mounting swap partition as it's mounted using swapon
+  # Ignore partitions without mount_path
+  # Ensure the /mnt is mounted before /mnt/path (respect mount tree)
+  with_items: "{{
+    partition_list
+    | difference([partition_swap])
+    | rejectattr('mount_path', 'undefined')
+    | sort(attribute='mount_path')
+  }}"
