@@ -1,0 +1,44 @@
+---
+- name: Converge
+  hosts: instance
+  gather_facts: true
+  vars:
+    partition_wipe: false
+    partition_disk: "{{ test_device }}"
+    partition_boot:
+      num: 1
+      name: "boot"
+      flags: [boot, esp]
+      part_start: "0%"
+      part_end: "1.0GiB"
+      fstype: "vfat"
+      fstype_opts: "-F 32"
+      dev: "{{ partition_disk }}p1"
+      mount_path: "/mnt/boot"
+      fstab_opts: "defaults,nodev,nosuid,noexec,umask=0077"
+    partition_swap:
+      num: 2
+      name: "swap"
+      flags: [swap]
+      part_start: "1.0GiB"
+      part_end: "2.0GiB"
+      fstype: "ext4"
+      dev: "{{ partition_disk }}p2"
+      mount_path: "none"
+    partition_root:
+      num: 3
+      name: "root"
+      part_start: "2.0GiB"
+      part_end: "100%"
+      fstype: "ext4"
+      dev: "{{ partition_disk }}p3"
+      mount_path: "/mnt"
+    partition_extras: []
+
+  pre_tasks:
+    - name: "Get test facts"
+      ansible.builtin.set_fact:
+        test_device: "{{ hostvars['localhost']['test_device'] }}"
+
+  roles:
+    - role: partition
