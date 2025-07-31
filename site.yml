@@ -1,0 +1,6 @@
+---
+- name: Distro Install
+  hosts: all
+  become: true
+  roles:
+    - role: partition
