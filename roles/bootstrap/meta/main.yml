@@ -1,0 +1,14 @@
+---
+dependencies:
+  - partition
+galaxy_info:
+  role_name: bootstarp
+  author: a14m
+  description: "Install the linux distro on partitioned drive using pacstrap or debootstrap"
+  company: "kartoffeln.work GmbH."
+  license: "license MIT"
+  min_ansible_version: "2.18"
+  platforms:
+    - name: ArchLinux
+      versions:
+        - all

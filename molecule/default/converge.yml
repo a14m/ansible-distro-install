@@ -3,6 +3,7 @@
   hosts: instance
   gather_facts: true
   vars:
+    hostname: "{{ test_hostname }}"
     partition_wipe: false
     partition_disk: "{{ test_device }}"
     partition_boot:
@@ -39,6 +40,8 @@
     - name: "Get test facts"
       ansible.builtin.set_fact:
         test_device: "{{ hostvars['localhost']['test_device'] }}"
+        test_hostname: "{{ hostvars['localhost']['test_hostname'] }}"
 
   roles:
     - role: partition
+    - role: bootstrap
