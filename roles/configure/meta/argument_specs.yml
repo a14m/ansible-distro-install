@@ -1,0 +1,13 @@
+---
+argument_specs:
+  main:
+    options:
+      configure_playbook_dir:
+        type: "str"
+        description: "The path to the configure playbook directory to run when provided"
+      hostname:
+        type: "str"
+        description: "Check hostname variable in role: bootstrap"
+      mnt_root_path:
+        type: "str"
+        description: "Check mnt_root_path fact in role: bootstrap"

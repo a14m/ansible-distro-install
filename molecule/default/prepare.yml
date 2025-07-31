@@ -14,7 +14,6 @@
         path: "/opt/vdd.img"
         size: 12G
         mode: "0755"
-        force: true
 
     - name: "Create test_device (loop block device)"
       become: true
