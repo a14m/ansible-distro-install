@@ -15,7 +15,7 @@
       fstype: "vfat"
       fstype_opts: "-F 32"
       dev: "{{ partition_disk }}p1"
-      mount_path: "/mnt/boot"
+      mount_path: "/mnt/boot/efi"
       fstab_opts: "defaults,nodev,nosuid,noexec,umask=0077"
     partition_swap:
       num: 2
