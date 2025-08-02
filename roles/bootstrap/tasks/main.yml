@@ -1,6 +1,7 @@
 ---
 - name: "Set root,boot partition paths"
   ansible.builtin.set_fact:
+    # noqa: var-naming[no-role-prefix] as these facts are used for multiple roles and is easier read this way
     mnt_boot_path: "{{ partition_boot.mount_path }}"
     mnt_root_path: "{{ partition_root.mount_path }}"
 

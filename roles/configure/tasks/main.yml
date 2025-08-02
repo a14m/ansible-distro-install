@@ -71,9 +71,9 @@
             --extra-vars "@/opt/ansible-distro-configure/host_vars/{{ hostname }}.yml"
             --tags 'required_for_boot'
         chdir: "/opt/ansible-distro-configure"
-      register: playbook
+      register: configure_playbook
       changed_when: true
 
     - name: "Playbook stdout"
       ansible.builtin.debug:
-        msg: "{{ playbook.stdout_lines }}"
+        msg: "{{ configure_playbook.stdout_lines }}"
