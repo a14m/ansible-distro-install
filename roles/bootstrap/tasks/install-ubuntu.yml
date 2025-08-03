@@ -48,8 +48,7 @@
   changed_when: true
   with_items:
     - "apt-get update"
-    - "apt-get install -y {{ bootstrap_distro.kernel_packages | join(' ') }}"
-    - "apt-get install -y systemd-boot systemd-boot-efi"
+    - "apt-get install -y {{ bootstrap_distro.packages | join(' ') }}"
 
 - name: "Run bootclt"
   ansible.builtin.command:
