@@ -9,6 +9,24 @@
   ansible.builtin.include_tasks: "install-archlinux.yml"
   when: ansible_os_family == "Archlinux"
 
-- name: "Install ubuntu"
-  ansible.builtin.include_tasks: "install-ubuntu.yml"
-  when: ansible_os_distribution == "Ubuntu"
+- name: "Install debian"
+  when: ansible_os_family == "Debian"
+  block:
+    - name: "Install ubuntu"
+      ansible.builtin.include_tasks: "install-ubuntu.yml"
+      when: ansible_distribution == "Ubuntu"
+
+    - name: "Install raspberry"
+      ansible.builtin.include_tasks: "install-raspberry.yml"
+      when: ansible_distribution == "Debian"
+
+    - name: "Configure hostname in chroot"
+      ansible.builtin.copy:
+        dest: "{{ mnt_root_path }}/etc/hostname"
+        mode: "0644"
+        content: "{{ hostname }}"
+
+    - name: "Ensure ansible dependencies are installed in chroot"
+      ansible.builtin.command:
+        cmd: "arch-chroot {{ mnt_root_path }} apt-get install -y python3"
+      changed_when: true

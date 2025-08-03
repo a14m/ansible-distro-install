@@ -1,0 +1,7 @@
+console=serial0,115200 \
+console=tty1 \
+root={{ partition_root.dev }} \
+rootfstype={{ partition_root.fstype }} \
+elevator=deadline \
+fsck.repair=yes \
+rootwait

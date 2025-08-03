@@ -18,13 +18,7 @@
       {{ bootstrap_distro.name }}
       {{ mnt_root_path }}
       {{ bootstrap_distro.mirror_url }}"
-  register: bootstrap_result
   changed_when: true
-
-- name: "Display bootstrap output"
-  ansible.builtin.debug:
-    var: bootstrap_result.stdout_lines
-    verbosity: 1
 
 - name: "Generate fstab"
   ansible.builtin.shell:
@@ -104,14 +98,3 @@
   with_items:
     - "{{ mnt_boot_path }}/{{ bootstrap_machine_id.stdout }}"
     - "{{ mnt_boot_path }}/loader/entries/{{ bootstrap_machine_id.stdout }}-{{ bootstrap_kernel_version.stdout }}.conf"
-
-- name: "Configure hostname in chroot"
-  ansible.builtin.copy:
-    dest: "{{ mnt_root_path }}/etc/hostname"
-    mode: "0644"
-    content: "{{ hostname }}"
-
-- name: "Ensure ansible dependencies are installed in chroot"
-  ansible.builtin.command:
-    cmd: "arch-chroot {{ mnt_root_path }} apt-get install -y python3"
-  changed_when: true
