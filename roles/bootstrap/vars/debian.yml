@@ -6,12 +6,9 @@ bootstrap_distro:
     - "raspberrypi-kernel"
     - "raspberrypi-bootloader"
     - "firmware-brcm80211"
-    - "systemd-sysv"
-    - "udev"
-    - "kmod"
     - "rpi-eeprom"
 
-bootstrap_opts: "--arch=arm64 --include=systemd,udev"
+bootstrap_opts: "--arch=arm64"
 
 bootstrap_apt_ignored_preferences: ""
 
@@ -19,8 +16,8 @@ bootstrap_apt_ignored_preferences: ""
 bootstrap_apt_sources: |
   deb [signed-by=/usr/share/keyrings/raspberrypi.gpg] http://archive.raspberrypi.org/debian {{ bootstrap_distro.name }} main
   deb http://deb.debian.org/debian {{ bootstrap_distro.name }} main
-
 # yamllint enable rule:line-length
+
 # 1 = SD card
 # f = Restart (loop back)
 # 6 = NVMe SSD
