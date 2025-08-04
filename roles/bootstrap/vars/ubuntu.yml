@@ -2,7 +2,7 @@
 bootstrap_distro:
   name: "noble" # => Ubuntu 24.04
   mirror_url: "http://archive.ubuntu.com/ubuntu/"
-  install_packages:
+  packages:
     - "linux-generic-hwe-24.04"
     - "systemd-boot"
     - "systemd-boot-efi"
