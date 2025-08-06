@@ -37,20 +37,35 @@ jobs:
     runs-on: ${{ matrix.molecule_distro.runs_on }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          repository: "a14m/ansible-distro-install"
+          path: "ansible-distro-install"
+      - uses: actions/checkout@v4
+        with:
+          repository: "a14m/ansible-distro-configure"
+          path: "ansible-distro-configure"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.x"
       - name: Install dependencies
         run: pip3 install ansible molecule molecule-plugins[docker]
-      - name: Copy example files
+      - name: Copy distro install example files
         run: |
-          # Copy host_vars (from the .example files)
-          for f in host_vars/*.example; do cp "$f" "$(echo "$f" | sed s/\.example//)"; done
+          # Use example files for testing instead of encrypted files
+          cd ansible-distro-install &&
+          for f in host_vars/*.example; do mv "$f" "$(echo "$f" | sed s/\.example//)"; done
+      - name: Copy distro configure example files
+        run: |
+          # Use example files for testing instead of encrypted files
+          cd ansible-distro-configure &&
+          for f in group_vars/*.example; do mv "$f" "$(echo "$f" | sed s/\.example//)"; done &&
+          for f in host_vars/*.example; do mv "$f" "$(echo "$f" | sed s/\.example//)"; done
       - name: Run
         env:
           PY_COLORS: 1
           ANSIBLE_FORCE_COLOR: 1
         run: >-
+          cd ansible-distro-install &&
           molecule --version &&
           ansible --version &&
           MOLECULE_COMMAND=${{ matrix.molecule_distro.command }}
