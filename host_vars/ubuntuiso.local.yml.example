@@ -1,0 +1,47 @@
+---
+hostname: "ubuntu.local"
+partition_disk: "/dev/sda"
+partition_wipe: false
+partition_boot:
+  num: 1
+  name: "boot"
+  flags: [boot, esp]
+  part_start: "0%"
+  part_end: "1.0GiB"
+  fstype: "vfat"
+  fstype_opts: "-F 32"
+  dev: "{{ partition_disk }}1"
+  mount_path: "/mnt/boot/efi"
+  fstab_opts: "defaults,nodev,nosuid,noexec,umask=0077"
+partition_swap:
+  num: 2
+  name: "swap"
+  flags: [swap]
+  part_start: "1.0GiB"
+  part_end: "9.0GiB"
+  fstype: "ext4"
+  dev: "{{ partition_disk }}2"
+  mount_path: "none"
+partition_root:
+  num: 3
+  name: "ubuntu-root"
+  part_start: "9.0GiB"
+  part_end: "59.0GiB"
+  fstype: "ext4"
+  dev: "{{ partition_disk }}3"
+  mount_path: "/mnt"
+partition_extras:
+  - num: 4
+    name: "arch-root"
+    part_start: "59.0GiB"
+    part_end: "109.0GiB"
+    fstype: "ext4"
+    dev: "{{ partition_disk }}4"
+  - num: 5
+    name: "home"
+    part_start: "109.0GiB"
+    part_end: "100%"
+    fstype: "ext4"
+    dev: "{{ partition_disk }}5"
+    mount_path: "/mnt/home"
+configure_playbook_dir: "../ansible-distro-configure"
