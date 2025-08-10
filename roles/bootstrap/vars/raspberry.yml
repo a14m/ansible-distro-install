@@ -1,12 +1,15 @@
 ---
 bootstrap_distro:
-  name: "bookworm" # => Debian 12/Raspberry OS
+  name: "bookworm" # => Debian 12
   mirror_url: "http://deb.debian.org/debian"
   packages:
-    - "raspberrypi-kernel"
-    - "raspberrypi-bootloader"
-    - "firmware-brcm80211"
     - "rpi-eeprom"
+    - "rpi-update"
+    - "fake-hwclock"
+    - "man-db"
+    - "manpages"
+    - "net-tools"
+    - "ntp"
 
 bootstrap_opts: "--arch=arm64"
 
