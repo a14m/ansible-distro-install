@@ -21,21 +21,21 @@ jobs:
           ansible-lint
 
   playbook:
-    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         molecule_distro:
           - distro: archlinux
             platform: "linux/amd64"
+            runs_on: "ubuntu-latest"
           - distro: ubuntu
             platform: "linux/amd64"
+            runs_on: "ubuntu-latest"
           - distro: raspberrypi
             platform: "linux/arm64/v8"
+            runs_on: "ubuntu-24.04-arm"
+    runs-on: ${{ matrix.molecule_distro.runs_on }}
     steps:
-      - name: Add ARM support
-        run: |
-          sudo apt-get install -y qemu-user-static binfmt-support
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
