@@ -8,8 +8,8 @@ driver:
   name: docker
 platforms:
   - name: instance
-    image: ${MOLECULE_DISTRO:-archlinux}
-    dockerfile: Dockerfile.${MOLECULE_DISTRO:-archlinux}.j2
+    image: "${MOLECULE_DISTRO:-archlinux}"
+    dockerfile: "Dockerfile.${MOLECULE_DISTRO:-archlinux}.j2"
     platform: "${MOLECULE_PLATFORM:-linux/amd64}"
     pre_build_image: false
     privileged: true

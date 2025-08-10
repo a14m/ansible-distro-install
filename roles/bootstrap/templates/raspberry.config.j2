@@ -1,17 +1,18 @@
-[pi5]
-kernel=kernel_2712.img
-dtparam=pciex1
-dtparam=pciex1_gen=2
-
-[all]
+dtparam=audio=on
+camera_auto_detect=1
+display_auto_detect=1
+auto_initramfs=1
+dtoverlay=vc4-kms-v3d
+max_framebuffers=2
+disable_fw_kms_setup=1
 arm_64bit=1
+disable_overscan=1
 arm_boost=1
 
-disable_overscan=1
-disable_fw_kms_setup=1
+[cm4]
+otg_mode=1
 
-camera_auto_detect=0
-display_auto_detect=0
-dtparam=audio=on
+[cm5]
+dtoverlay=dwc2,dr_mode=host
 
-auto_initramfs=1
+[all]
