@@ -9,8 +9,8 @@ argument_specs:
       partition_boot:
         type: "dict"
         required: true
-        description: "Check partition_boot argument in role: partition"
+        description: "Check partition_root argument in role: partition, required options: mount_path"
       partition_root:
         type: "dict"
         required: true
-        description: "Check partition_root argument in role: partition"
+        description: "Check partition_root argument in role: partition, required options: mount_path"
