@@ -8,7 +8,7 @@
         distro_hostname_mapping:
           archlinux: "archlinux.local"
           ubuntu: "ubuntu.local"
-          debian: "rpi5.local"
+          raspberrypi: "rpi5.local"
 
     - name: "Create virtual disk image"
       become: true

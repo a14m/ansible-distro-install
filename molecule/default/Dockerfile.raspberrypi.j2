@@ -8,13 +8,19 @@ ENV container docker
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        systemd systemd-sysv python3 parted dosfstools \
+        systemd python3 parted dosfstools \
     && rm -Rf /var/lib/apt/lists/* \
     && rm -Rf /usr/share/doc \
     && rm -Rf /usr/share/man \
     && apt-get clean
 
 RUN rm -f /lib/systemd/system/multi-user.target.wants/getty.target
+
+# Mimic the Raspberry OS Bookworm default boot (for testing)
+RUN mkdir -p /boot/firmware \
+    && touch /boot/firmware/kernel8.img \
+    && touch /boot/firmware/bootcode.bin \
+    && touch /boot/firmware/start.elf
 
 VOLUME ["/sys/fs/cgroup", "/tmp", "/run", "/opt"]
 

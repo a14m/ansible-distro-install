@@ -55,7 +55,7 @@
   changed_when: true
   with_items:
     - "apt-get update"
-    - "apt-get install -y {{ bootstrap_distro.packages | join(' ') }}"
+    - "apt-get install -y --no-install-recommends {{ bootstrap_distro.packages | join(' ') }}"
 
 - name: "Copy kernel to boot partition"
   # NOTE: Copying {{ mnt_root_path }}/boot/ doesn't work
@@ -82,3 +82,4 @@
   args:
     executable: "bash"
   changed_when: true
+  tags: ["molecule-notest"]
