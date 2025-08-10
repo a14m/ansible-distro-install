@@ -1,7 +1,15 @@
 ---
+- name: "Set root partition paths"
+  ansible.builtin.set_fact:
+    configure_chroot_path: "{{ partition_root.mount_path }}"
+
 - name: "Install archlinux"
   ansible.builtin.include_tasks: "install-archlinux.yml"
   when: ansible_os_family == "Archlinux"
+
+- name: "Install debian"
+  ansible.builtin.include_tasks: "install-debian.yml"
+  when: ansible_os_family == "Debian"
 
 - name: "Install ansible-core on live environment"
   # Can't install ansible-core using package manager
@@ -13,10 +21,7 @@
     break_system_packages: true
 
 - name: "Run distro-configure playbooks on bootstrapped distro"
-  when:
-    - configure_playbook_dir is defined
-    - mnt_root_path is defined
-    - hostname is defined
+  when: configure_playbook_dir is defined
   block:
     - name: "Archive playbook on controller"
       become: false
@@ -55,7 +60,7 @@
               ansible_connection: "chroot"
               ansible_chroot_exe: "arch-chroot"
             hosts:
-              {{ mnt_root_path }}:
+              {{ configure_chroot_path }}:
 
     - name: "Download playbook dependencies on live environment"
       ansible.builtin.command:

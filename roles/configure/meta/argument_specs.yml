@@ -7,7 +7,9 @@ argument_specs:
         description: "The path to the configure playbook directory to run when provided"
       hostname:
         type: "str"
-        description: "Check hostname variable in role: bootstrap"
-      mnt_root_path:
-        type: "str"
-        description: "Check mnt_root_path fact in role: bootstrap"
+        required: true
+        description: "The distro linux hostname to be configured (will configure if availabe in inventory)"
+      partition_root:
+        type: "dict"
+        required: true
+        description: "Check partition_root argument in role: partition, required options: mount_path"
