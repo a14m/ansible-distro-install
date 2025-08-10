@@ -1,6 +1,6 @@
-# Ansible RC Playbooks
+# Ansible Distro Install Playbooks
 
-Ansible roles and playbooks to install different distros and configure `.rc`.
+Ansible roles and playbooks to install different *nix distros.
 
 ## Prerequisite
 
@@ -23,11 +23,10 @@ Ex. `rm .gitattributes && cp host_vars/ubuntuiso.local.yml.example host_vars/ubu
 
 - [Arch Linux](./archlinux.md)
 - [Debian Ubuntu](./ubuntu.md)
+- [Raspberry PI 5](./raspberry.md)
 
 ## Playbook: distro-install
 
-- Optional: Clone the [`distro-configure`](https://git.sr.ht/~a14m/ansible-distro-configure) playbook
-- Optional: Configure the desired `host_vars` in the `distro-configure` playbook
 - Follow the pre-install guides for desired distro in "Boot distro live image"
 - Install ansible required dependencies
 - Configure the desired `host_vars` in this playbook
@@ -36,14 +35,32 @@ Ex. `rm .gitattributes && cp host_vars/ubuntuiso.local.yml.example host_vars/ubu
 **Example**:
 
 ```bash
-git clone https://git.sr.ht/~a14m/ansible-distro-configure /opt/distro-configure
-cp /opt/distro-configure/host_vars/${DISTRO}.local.yml.example /opt/distro-configure/host_vars/${DISTRO}.local.yml
-
 git clone https://git.sr.ht/~a14m/ansible-distro-install /opt/distro-install
 cp /opt/distro-install/host_vars/${DISTRO}iso.local.yml.example /opt/distro-install/host_vars/${DISTRO}iso.local.yml
 
-ansible-galaxy install -r requirements.yml
 cd /opt/distro-install
+ansible-galaxy install -r requirements.yml
+
+ansible-playbook site.yml --ask-pass
+```
+
+## Playbook: distro-configure
+
+- Clone the [`distro-configure`](https://git.sr.ht/~a14m/ansible-distro-configure) playbook
+- Configure the desired `host_vars` in the `distro-configure` playbook
+- Run the playbook with `configure_playbook_dir` variable
+
+**Example**:
+
+```bash
+git clone https://git.sr.ht/~a14m/ansible-distro-install /opt/distro-install
+cp /opt/distro-install/host_vars/${DISTRO}iso.local.yml.example /opt/distro-install/host_vars/${DISTRO}iso.local.yml
+
+git clone https://git.sr.ht/~a14m/ansible-distro-configure /opt/distro-configure
+cp /opt/distro-configure/host_vars/${DISTRO}.local.yml.example /opt/distro-configure/host_vars/${DISTRO}.local.yml
+
+cd /opt/distro-install
+ansible-galaxy install -r requirements.yml
 
 ansible-playbook site.yml --ask-pass --extra-vars '{"configure_playbook_dir":"/opt/distro-configure"}'
 ```
