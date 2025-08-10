@@ -32,7 +32,7 @@ For example, the following `archiso.local` and `ubuntuiso.local` diff shows how 
     fstype: "vfat"
     fstype_opts: "-F 32"
     dev: "{{ partition_disk }}1"
-    mount_path: "/mnt/boot"
+    mount_path: "/mnt/boot/efi"
     fstab_opts: "defaults,nodev,nosuid,noexec,umask=0077"
   partition_swap:
     num: 2
@@ -86,3 +86,6 @@ sets the `partition_wipe` parameter to `true` in order to wipe the hard drive an
 while the other systems (`ubuntu` in the previous example) sets the `partition_wipe` to `false`.
 
 Otherwise, the hard drive will be wiped and repartitioned again.
+
+For Debian distros, it's simpler to mount the boot on `/boot/efi` to avoid issues with Debian distros kernel setup
+(as Debian kernel setup uses linking which isn't allowed on vFAT file systems)
