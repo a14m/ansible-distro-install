@@ -35,6 +35,7 @@
       dev: "{{ partition_disk }}p3"
       mount_path: "/mnt"
     partition_extras: []
+    configure_playbook_dir: "../../../ansible-distro-configure"
 
   pre_tasks:
     - name: "Get test facts"
@@ -45,3 +46,4 @@
   roles:
     - role: partition
     - role: bootstrap
+    - role: configure
