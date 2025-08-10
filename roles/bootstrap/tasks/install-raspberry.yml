@@ -1,0 +1,84 @@
+---
+- name: "Include distribution vars"
+  ansible.builtin.include_vars: "{{ ansible_distribution | lower }}.yml"
+
+- name: "Ensure install dependencies are installed on live environment"
+  ansible.builtin.apt:
+    state: "present"
+    update_cache: true
+    pkg:
+      - "debootstrap"
+      - "arch-install-scripts"
+      - "gnupg"
+      - "bash"
+
+- name: "Run debootstrap"
+  ansible.builtin.command:
+    cmd: "debootstrap
+      {{ bootstrap_opts }}
+      {{ bootstrap_distro.name }}
+      {{ mnt_root_path }}
+      {{ bootstrap_distro.mirror_url }}"
+  changed_when: true
+
+- name: "Generate fstab"
+  ansible.builtin.shell:
+    cmd: "genfstab -t PARTLABEL {{ mnt_root_path }} > {{ mnt_root_path }}/etc/fstab"
+  changed_when: true
+
+- name: "Configure apt in chroot"
+  ansible.builtin.copy:
+    dest: "{{ item.dest }}"
+    mode: "0640"
+    content: "{{ item.content }}"
+  with_items:
+    - dest: "{{ mnt_root_path }}/etc/apt/preferences.d/ignored-package"
+      content: "{{ bootstrap_apt_ignored_preferences }}"
+    - dest: "{{ mnt_root_path }}/etc/apt/sources.list"
+      content: "{{ bootstrap_apt_sources }}"
+
+- name: "Download signing key"
+  ansible.builtin.get_url:
+    url: "https://archive.raspberrypi.org/debian/raspberrypi.gpg.key"
+    dest: "/opt/raspberrypi.gpg.key"
+    force: true
+    mode: "0644"
+
+- name: "Dearmor signing key"
+  ansible.builtin.command:
+    cmd: "gpg -o {{ mnt_root_path }}/usr/share/keyrings/raspberrypi.gpg --dearmor /opt/raspberrypi.gpg.key"
+  changed_when: true
+
+- name: "Configure system in chroot"
+  ansible.builtin.command:
+    cmd: "arch-chroot {{ mnt_root_path }} {{ item }}"
+  changed_when: true
+  with_items:
+    - "apt-get update"
+    - "apt-get install -y {{ bootstrap_distro.packages | join(' ') }}"
+
+- name: "Copy kernel to boot partition"
+  # NOTE: Copying {{ mnt_root_path }}/boot/ doesn't work
+  # NOTE: Alternative, download latest fresh from https://github.com/raspberrypi/firmware/archive/refs/heads/master.zip
+  ansible.builtin.shell: |
+    cp -r /boot/firmware/* {{ mnt_boot_path }}/
+  changed_when: true
+
+- name: "Configure bootloader"
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "0644"
+  with_items:
+    - src: "raspberry.config.j2"
+      dest: "{{ mnt_boot_path }}/config.txt"
+    - src: "raspberry.cmdline.j2"
+      dest: "{{ mnt_boot_path }}/cmdline.txt"
+
+- name: "Configure boot order"
+  ansible.builtin.shell: |
+    set -eo pipefail
+    rpi-eeprom-config --apply <(rpi-eeprom-config | sed 's/^BOOT_ORDER=.*/BOOT_ORDER={{ bootstrap_boot_order }}/')
+  args:
+    executable: "bash"
+  changed_when: true
