@@ -1,0 +1,120 @@
+---
+argument_specs:
+  main:
+    options:
+      partition_disk:
+        type: "str"
+        required: true
+        description: "The device to partition. (ex: /dev/nvme0n1)"
+      partition_wipe:
+        type: "bool"
+        default: "false"
+        description: "Force wiping of the partition_disk"
+      partition_boot:
+        type: "dict"
+        description: "The boot partition definition"
+        required: true
+        options: &partition_options
+          num:
+            type: "int"
+            description: "Partition number"
+            required: true
+          name:
+            type: "str"
+            description: "Partition name"
+            required: true
+          label:
+            type: "str"
+            description: "Partition label"
+            default: "gpt"
+            choices:
+              - "aix"
+              - "amiga"
+              - "bsd"
+              - "dvh"
+              - "gpt"
+              - "loop"
+              - "mac"
+              - "msdos"
+              - "pc98"
+              - "sun"
+          flags:
+            type: "list"
+            description: "Partition flags"
+            default: []
+            elements: "str"
+            choices:
+              - "atvrecv"
+              - "bios_grup"
+              - "boot"
+              - "DIAG"
+              - "esp"
+              - "hidden"
+              - "hp-service"
+              - "irst"
+              - "lba"
+              - "legacy_boot"
+              - "LVM"
+              - "msftdata"
+              - "msftres"
+              - "PALO"
+              - "PREP"
+              - "raid"
+              - "root"
+              - "swap"
+          part_start:
+            type: "str"
+            description: "Partition start (ex: 10GiB, 15%)"
+            required: true
+          part_end:
+            type: "str"
+            description: "Partition end (ex: 11GiB, 100%)"
+            required: true
+          fstype:
+            type: "str"
+            description: "Partition filesystem type"
+            required: true
+            choices:
+              - "bcachefs"
+              - "btrfs"
+              - "ext2"
+              - "ext3"
+              - "ext4"
+              - "ext4dev"
+              - "f2fs"
+              - "lvm"
+              - "ocfs2"
+              - "reiserfs"
+              - "xfs"
+              - "vfat"
+              - "swap"
+              - "ufs"
+          fstype_opts:
+            type: "str"
+            description: "List of options to be passed to mkfs command"
+            default: ""
+          dev:
+            type: "str"
+            description: "Partition device path (ex: /dev/nvme0n1p3) ignore for partitions not used in playbook"
+          mount_path:
+            type: "str"
+            description: "Partition mount path (ex: /mnt/home), ignore for partitions not used in playbook"
+          fstab_opts:
+            type: "str"
+            description: "Options used for mounting (fstab options)"
+            default: "defaults"
+      partition_swap:
+        type: "dict"
+        description: "The swap partition definition"
+        options: *partition_options
+      partition_root:
+        description: "The root partition definition"
+        required: true
+        options: *partition_options
+      partition_extras:
+        type: "list"
+        description: "The list of extra partitions"
+        required: false
+        default: []
+        elements: "dict"
+        options: *partition_options
