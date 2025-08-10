@@ -1,0 +1,79 @@
+---
+- name: "Install archlinux"
+  ansible.builtin.include_tasks: "install-archlinux.yml"
+  when: ansible_os_family == "Archlinux"
+
+- name: "Install ansible-core on live environment"
+  # Can't install ansible-core using package manager
+  # This resolve the "ERROR! ansible-galaxy requires resolvelib<1.1.1,>=0.5.3"
+  # where the python-resolvelib was updated but ansible package wasn't in the package managers
+  ansible.builtin.pip:
+    name: "ansible-core>=2.18"
+    state: "present"
+    break_system_packages: true
+
+- name: "Run distro-configure playbooks on bootstrapped distro"
+  when:
+    - configure_playbook_dir is defined
+    - mnt_root_path is defined
+    - hostname is defined
+  block:
+    - name: "Archive playbook on controller"
+      become: false
+      community.general.archive:
+        path: "{{ configure_playbook_dir }}/*"
+        dest: "/tmp/ansible-distro-configure.tar.gz"
+        mode: "0644"
+        format: "gz"
+        force_archive: true
+        exclude_path:
+          - "{{ configure_playbook_dir }}/.git"
+          - "{{ configure_playbook_dir }}/molecule"
+      delegate_to: localhost
+
+    - name: "Ensure playbook directory exists on live environment"
+      ansible.builtin.file:
+        path: "/opt/ansible-distro-configure"
+        state: "directory"
+        mode: "0750"
+
+    - name: "Unarchive playbook on live environment"
+      ansible.builtin.unarchive:
+        src: "/tmp/ansible-distro-configure.tar.gz"
+        dest: "/opt/ansible-distro-configure/"
+        list_files: false
+        remote_src: false
+
+    - name: "Update configure playbook inventory"
+      ansible.builtin.copy:
+        dest: "/opt/ansible-distro-configure/inventory/hosts.yml"
+        mode: "0640"
+        content: |
+          chroot:
+            vars:
+              ansible_user: "root"
+              ansible_connection: "chroot"
+              ansible_chroot_exe: "arch-chroot"
+            hosts:
+              {{ mnt_root_path }}:
+
+    - name: "Download playbook dependencies on live environment"
+      ansible.builtin.command:
+        cmd: "ansible-galaxy install -r /opt/ansible-distro-configure/requirements.yml"
+      changed_when: true
+
+    - name: "Run configure playbook using chroot connection"
+      ansible.builtin.command:
+        cmd: |
+          ansible-playbook site.yml
+            --limit "chroot"
+            --extra-vars '{"hostname":"{{ hostname }}"}'
+            --extra-vars "@/opt/ansible-distro-configure/host_vars/{{ hostname }}.yml"
+            --tags 'required_for_boot'
+        chdir: "/opt/ansible-distro-configure"
+      register: playbook
+      changed_when: true
+
+    - name: "Playbook stdout"
+      ansible.builtin.debug:
+        msg: "{{ playbook.stdout_lines }}"

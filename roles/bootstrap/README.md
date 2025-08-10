@@ -2,6 +2,10 @@
 
 This role bootstraps the installation of a linux distro
 
+## Dependencies
+
+- Role: `partition`
+
 ## Role Variables
 
 - `hostname` the distro linux network hostname to be used.
