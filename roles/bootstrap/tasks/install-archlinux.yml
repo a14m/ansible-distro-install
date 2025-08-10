@@ -1,0 +1,57 @@
+---
+- name: "Run pacstrap"
+  ansible.builtin.command:
+    cmd: "pacstrap -K {{ mnt_root_path }} base linux linux-firmware"
+  changed_when: true
+
+- name: "Generate fstab"
+  ansible.builtin.shell:
+    cmd: "genfstab -t PARTLABEL {{ mnt_root_path }} > {{ mnt_root_path }}/etc/fstab"
+  changed_when: true
+
+- name: "Run bootclt"
+  ansible.builtin.command:
+    cmd: "arch-chroot {{ mnt_root_path }} bootctl install"
+  changed_when: true
+
+- name: "Enable systemd-boot-update"
+  ansible.builtin.command:
+    cmd: "arch-chroot {{ mnt_root_path }} systemctl enable systemd-boot-update"
+  changed_when: false
+
+- name: "Template systemd-boot files"
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "0644"
+  with_items:
+    - src: "loader.conf.j2"
+      dest: "{{ mnt_boot_path }}/loader/loader.conf"
+    - src: "archlinux.conf.j2"
+      dest: "{{ mnt_boot_path }}/loader/entries/archlinux.conf"
+
+- name: "Configure hostname in chroot"
+  ansible.builtin.copy:
+    dest: "{{ mnt_root_path }}/etc/hostname"
+    mode: "0644"
+    content: "{{ hostname }}"
+
+- name: "Configure pacman in chroot"
+  ansible.builtin.copy:
+    src: "/etc/pacman.conf"
+    dest: "{{ mnt_root_path }}/etc/pacman.conf"
+    remote_src: true
+    force: false
+    mode: "0644"
+
+- name: "Ensure pacman is updated in chroot"
+  ansible.builtin.shell: |
+    arch-chroot {{ mnt_root_path }} pacman-key --init
+    arch-chroot {{ mnt_root_path }} pacman-key --populate
+    arch-chroot {{ mnt_root_path }} pacman -Syyu --noconfirm
+  changed_when: true
+
+- name: "Ensure ansible dependencies are installed in chroot"
+  ansible.builtin.command:
+    cmd: "arch-chroot {{ mnt_root_path }} pacman -S --noconfirm python3"
+  changed_when: true
