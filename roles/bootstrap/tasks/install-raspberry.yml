@@ -1,6 +1,6 @@
 ---
-- name: "Include distribution vars"
-  ansible.builtin.include_vars: "{{ ansible_distribution | lower }}.yml"
+- name: "Include Raspberry vars"
+  ansible.builtin.include_vars: "raspberry.yml"
 
 - name: "Ensure install dependencies are installed on live environment"
   ansible.builtin.apt:
@@ -55,14 +55,19 @@
   changed_when: true
   with_items:
     - "apt-get update"
-    - "apt-get install -y --no-install-recommends {{ bootstrap_distro.packages | join(' ') }}"
+    - "apt-get install -y {{ bootstrap_distro.packages | join(' ') }}"
 
-- name: "Copy kernel to boot partition"
-  # NOTE: Copying {{ mnt_root_path }}/boot/ doesn't work
-  # NOTE: Alternative, download latest fresh from https://github.com/raspberrypi/firmware/archive/refs/heads/master.zip
-  ansible.builtin.shell: |
-    cp -r /boot/firmware/* {{ mnt_boot_path }}/
+- name: "Update rpi kernel and firmware"
+  ansible.builtin.command:
+    cmd: "arch-chroot {{ mnt_root_path }} rpi-update"
+  environment:
+    SKIP_BACKUP: "1"
+    WANT_64BIT: "1"
+    WANT_PI5: "1"
+    SKIP_WARNING: "1"
+    SKIP_CHECK_PARTITION: "1"
   changed_when: true
+  tags: ["molecule-notest"]
 
 - name: "Configure bootloader"
   ansible.builtin.template:
