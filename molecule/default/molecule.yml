@@ -10,9 +10,10 @@ platforms:
   - name: instance
     image: ${MOLECULE_DISTRO:-archlinux}
     dockerfile: Dockerfile.${MOLECULE_DISTRO:-archlinux}.j2
+    platform: "${MOLECULE_PLATFORM:-linux/amd64}"
     pre_build_image: false
     privileged: true
-    command: ${MOLECULE_COMMAND:-""}
+    command: "${MOLECULE_COMMAND:-/lib/systemd/systemd}"
     tmpfs:
       - "/tmp"
       - "/run"
