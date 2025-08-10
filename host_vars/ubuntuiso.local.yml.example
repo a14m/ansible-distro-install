@@ -44,4 +44,3 @@ partition_extras:
     fstype: "ext4"
     dev: "{{ partition_disk }}5"
     mount_path: "/mnt/home"
-configure_playbook_dir: "../ansible-distro-configure"
