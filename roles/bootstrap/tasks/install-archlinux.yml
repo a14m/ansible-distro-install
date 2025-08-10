@@ -36,12 +36,18 @@
     - src: "archlinux.conf.j2"
       dest: "{{ mnt_boot_path }}/loader/entries/archlinux.conf"
 
+- name: "Create distro kernel directory"
+  ansible.builtin.file:
+    path: "{{ mnt_boot_path }}/archlinux"
+    state: "directory"
+    mode: "0700"
+
 - name: "Copy kernel to efi partition"
   ansible.builtin.copy:
     src: "{{ item }}"
-    dest: "{{ mnt_boot_path }}"
+    dest: "{{ mnt_boot_path }}/archlinux/"
     remote_src: true
-    mode: "0644"
+    mode: "0700"
   with_items:
     - "{{ mnt_root_path }}/boot/vmlinuz-linux"
     - "{{ mnt_root_path }}/boot/initramfs-linux.img"
@@ -60,9 +66,9 @@
       [Action]
       Description = Updating systemd-boot
       When = PostTransaction
-      Exec = /usr/bin/cp /boot/vmlinuz-linux /boot/efi/vmlinuz-linux
-      Exec = /usr/bin/cp /boot/initramfs-linux.img /boot/efi/initramfs-linux.img
-      Exec = /usr/bin/cp /boot/initramfs-linux-fallback.img /boot/efi/initramfs-linux-fallback.img
+      Exec = /usr/bin/cp /boot/vmlinuz-linux /boot/efi/archlinux/vmlinuz-linux
+      Exec = /usr/bin/cp /boot/initramfs-linux.img /boot/efi/archlinux/initramfs-linux.img
+      Exec = /usr/bin/cp /boot/initramfs-linux-fallback.img /boot/efi/archlinux/initramfs-linux-fallback.img
 
 - name: "Configure hostname in chroot"
   ansible.builtin.copy:
