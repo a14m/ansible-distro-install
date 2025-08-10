@@ -1,0 +1,9 @@
+---
+- name: Cleanup
+  hosts: localhost
+  tasks:
+    - name: "Remove testing loop device"
+      become: true
+      ansible.builtin.command:
+        cmd: "losetup -D"
+      changed_when: false
