@@ -54,7 +54,7 @@
         dest: "/opt/ansible-distro-configure/inventory/hosts.yml"
         mode: "0640"
         content: |
-          chroot:
+          {{ hostname }}:
             vars:
               ansible_user: "root"
               ansible_connection: "chroot"
@@ -71,7 +71,7 @@
       ansible.builtin.command:
         cmd: |
           ansible-playbook site.yml
-            --limit "chroot"
+            --limit "{{ hostname }}"
             --extra-vars '{"hostname":"{{ hostname }}"}'
             --extra-vars "@/opt/ansible-distro-configure/host_vars/{{ hostname }}.yml"
             --tags 'required_for_boot'
