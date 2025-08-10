@@ -64,12 +64,6 @@
       Exec = /usr/bin/cp /boot/initramfs-linux.img /boot/efi/archlinux/initramfs-linux.img
       Exec = /usr/bin/cp /boot/initramfs-linux-fallback.img /boot/efi/archlinux/initramfs-linux-fallback.img
 
-- name: "Configure hostname in chroot"
-  ansible.builtin.copy:
-    dest: "{{ mnt_root_path }}/etc/hostname"
-    mode: "0644"
-    content: "{{ hostname }}"
-
 - name: "Configure pacman in chroot"
   ansible.builtin.copy:
     src: "/etc/pacman.conf"

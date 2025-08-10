@@ -1,8 +1,8 @@
 ---
-- name: Distro Install
+- name: "Distro Install"
   hosts: all
   become: true
   roles:
-    - role: partition
-    - role: bootstrap
-    - role: configure
+    - role: "partition"
+    - role: "bootstrap"
+    - role: "configure"
