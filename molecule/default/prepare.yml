@@ -3,6 +3,11 @@
   hosts: localhost
   gather_facts: true
   tasks:
+    - name: "Set distro test host name mapping"
+      ansible.builtin.set_fact:
+        distro_hostname_mapping:
+          archlinux: "archlinux.local"
+
     - name: "Create virtual disk image"
       become: true
       community.general.filesize:
@@ -21,6 +26,7 @@
     - name: "Set test facts"
       ansible.builtin.set_fact:
         test_device: "{{ loop_device.stdout }}"
+        test_hostname: "{{ distro_hostname_mapping[lookup('ansible.builtin.env', 'MOLECULE_DISTRO')] }}"
         cacheable: true
 
     - name: "Show test info"
@@ -29,3 +35,5 @@
       with_items:
         - name: "Test Device"
           value: "{{ test_device }}"
+        - name: "Test Hostname;"
+          value: "{{ test_hostname }}"

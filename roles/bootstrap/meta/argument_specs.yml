@@ -1,0 +1,16 @@
+---
+argument_specs:
+  main:
+    options:
+      hostname:
+        type: "str"
+        required: true
+        description: "The distro linux hostname to be configured (will configure if availabe in inventory)"
+      partition_boot:
+        type: "dict"
+        required: true
+        description: "Check partition_boot argument in role: partition"
+      partition_root:
+        type: "dict"
+        required: true
+        description: "Check partition_root argument in role: partition"
