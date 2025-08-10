@@ -1,6 +1,5 @@
 ---
-dependencies:
-  - bootstrap
+dependencies: []
 galaxy_info:
   role_name: configure
   author: a14m
@@ -12,3 +11,6 @@ galaxy_info:
     - name: ArchLinux
       versions:
         - all
+    - name: Ubuntu
+      versions:
+        - noble

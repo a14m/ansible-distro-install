@@ -7,6 +7,7 @@
       ansible.builtin.set_fact:
         distro_hostname_mapping:
           archlinux: "archlinux.local"
+          ubuntu: "ubuntu.local"
 
     - name: "Create virtual disk image"
       become: true
