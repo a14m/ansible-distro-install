@@ -14,7 +14,7 @@
 
 - name: "Show partition_list"
   ansible.builtin.debug:
-    msg: "{{ partition_list }}"
+    var: partition_list
 
 - name: "Erase device: {{ partition_disk }}"
   ansible.builtin.command:
