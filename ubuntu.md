@@ -16,6 +16,7 @@
 **Example:**
 
 ```bash
+passwd
 nmcli dev wifi connect <SSID> password <PASSPHRASE>
 sudo hostnamectl set-hostname ubuntuiso.local
 sudo apt update
