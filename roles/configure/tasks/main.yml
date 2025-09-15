@@ -70,7 +70,7 @@
     - name: "Run configure playbook using chroot connection"
       ansible.builtin.command:
         cmd: |
-          ansible-playbook site.yml
+          ansible-playbook bootstrap.yml
             --limit "{{ hostname }}"
             --extra-vars '{"hostname":"{{ hostname }}"}'
             --extra-vars "@/opt/ansible-distro-configure/host_vars/{{ hostname }}.yml"
