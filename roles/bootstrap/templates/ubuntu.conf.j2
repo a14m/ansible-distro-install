@@ -1,4 +1,0 @@
-title     Ubuntu 24.04
-linux     /ubuntu/vmlinuz-{{ bootstrap_kernel_version.stdout }}
-initrd    /ubuntu/initrd.img-{{ bootstrap_kernel_version.stdout }}
-options   root=PARTLABEL={{ partition_root.name }} rw queit splash
