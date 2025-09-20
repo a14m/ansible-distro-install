@@ -19,6 +19,6 @@ bootstrap_apt_ignored_preferences: |
   Pin-Priority: -1
 
 bootstrap_apt_sources: |
-  deb http://archive.ubuntu.com/ubuntu {{ bootstrap_distro.name }} main universe
-  deb http://archive.ubuntu.com/ubuntu {{ bootstrap_distro.name }}-security main universe
-  deb http://archive.ubuntu.com/ubuntu {{ bootstrap_distro.name }}-updates main universe
+  deb http://archive.ubuntu.com/ubuntu {{ bootstrap_distro.name }} main universe restricted
+  deb http://archive.ubuntu.com/ubuntu {{ bootstrap_distro.name }}-security main universe restricted
+  deb http://archive.ubuntu.com/ubuntu {{ bootstrap_distro.name }}-updates main universe restricted
