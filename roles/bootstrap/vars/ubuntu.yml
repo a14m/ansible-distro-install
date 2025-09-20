@@ -14,7 +14,7 @@ bootstrap_apt_ignored_preferences: |
   Pin: release *
   Pin-Priority: -1
 
-  Package: snapd cloud-init landscape-common popularity-contest ubuntu-advantage-tools
+  Package: cloud-init landscape-common popularity-contest ubuntu-advantage-tools
   Pin: release *
   Pin-Priority: -1
 
