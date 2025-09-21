@@ -9,6 +9,23 @@
     cmd: "genfstab -t PARTLABEL {{ mnt_root_path }} > {{ mnt_root_path }}/etc/fstab"
   changed_when: true
 
+- name: "Configure pacman in chroot"
+  ansible.builtin.copy:
+    src: "/etc/pacman.conf"
+    dest: "{{ mnt_root_path }}/etc/pacman.conf"
+    remote_src: true
+    force: false
+    mode: "0644"
+
+- name: "Configure system in chroot"
+  ansible.builtin.command:
+    cmd: "arch-chroot {{ mnt_root_path }} {{ item }}"
+  changed_when: true
+  loop:
+    - "pacman-key --init"
+    - "pacman-key --populate"
+    - "pacman -Syyu --noconfirm"
+
 - name: "Ensure rEFInd bootloader installed"
   ansible.builtin.command:
     cmd: "arch-chroot {{ mnt_root_path }} pacman -S --noconfirm refind"
@@ -34,6 +51,8 @@
     content: |
       timeout 5
       textonly true
+  # NOTE: this is skipped because the docker test doesn't have proper EFI/refind directory created
+  tags: ["molecule-notest"]
 
 - name: "Configure pacman hook for rEFInd kernel updates"
   ansible.builtin.copy:
@@ -50,23 +69,6 @@
       Description = Updating rEFInd after kernel update
       When = PostTransaction
       Exec = /usr/bin/refind-install
-
-- name: "Configure pacman in chroot"
-  ansible.builtin.copy:
-    src: "/etc/pacman.conf"
-    dest: "{{ mnt_root_path }}/etc/pacman.conf"
-    remote_src: true
-    force: false
-    mode: "0644"
-
-- name: "Configure system in chroot"
-  ansible.builtin.command:
-    cmd: "arch-chroot {{ mnt_root_path }} {{ item }}"
-  changed_when: true
-  loop:
-    - "pacman-key --init"
-    - "pacman-key --populate"
-    - "pacman -Syyu --noconfirm"
 
 - name: "Ensure ansible dependencies are installed in chroot"
   ansible.builtin.command:
