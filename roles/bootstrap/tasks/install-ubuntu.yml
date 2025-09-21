@@ -44,17 +44,20 @@
     - "apt-get update"
     - "apt-get install -y {{ bootstrap_distro.packages | join(' ') }}"
 
-- name: "Clean up old Linux Boot Manager entries"
-  ansible.builtin.shell:
-    cmd: |
-      for entry in $(efibootmgr | grep "Linux Boot Manager" | cut -d'*' -f1 | tr -d 'Boot'); do
-        efibootmgr -b $entry -B
-      done
-  changed_when: false
-  failed_when: false
-
-# NOTE: bootctl is not run in chroot to workaround https://github.com/systemd/systemd/issues/36174
-- name: "Run bootctl"
+- name: "Ensure rEFInd bootloader installed"
   ansible.builtin.command:
-    cmd: "bootctl install --esp-path={{ mnt_boot_path }}"
+    cmd: "arch-chroot {{ mnt_root_path }} apt-get install -y refind"
   changed_when: true
+
+- name: "Install rEFInd"
+  ansible.builtin.command:
+    cmd: "arch-chroot {{ mnt_root_path }} refind-install"
+  changed_when: true
+
+- name: "Configure rEFInd"
+  ansible.builtin.copy:
+    dest: "{{ mnt_root_path }}/boot/refind_linux.conf"
+    mode: "0644"
+    content: |
+      "Boot with defaults" "root=PARTLABEL={{ partition_root.name }} rw"
+      "Boot to terminal" "root=PARTLABEL={{ partition_root.name }} rw systemd.unit=multi-user.target"
