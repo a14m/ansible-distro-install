@@ -4,8 +4,6 @@ bootstrap_distro:
   mirror_url: "http://archive.ubuntu.com/ubuntu/"
   packages:
     - "linux-generic-hwe-24.04"
-    - "systemd-boot"
-    - "systemd-boot-efi"
 
 bootstrap_opts: ""
 
