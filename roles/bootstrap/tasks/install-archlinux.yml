@@ -9,70 +9,39 @@
     cmd: "genfstab -t PARTLABEL {{ mnt_root_path }} > {{ mnt_root_path }}/etc/fstab"
   changed_when: true
 
-- name: "Clean up old Linux Boot Manager entries"
-  ansible.builtin.shell:
-    cmd: |
-      for entry in $(efibootmgr | grep "Linux Boot Manager" | cut -d'*' -f1 | tr -d 'Boot'); do
-        efibootmgr -b $entry -B
-      done
-  changed_when: false
-  failed_when: false
-
-# NOTE: bootctl is not run in chroot to workaround https://github.com/systemd/systemd/issues/36174
-- name: "Run bootctl"
+- name: "Ensure rEFInd bootloader installed"
   ansible.builtin.command:
-    cmd: "bootctl install --esp-path={{ mnt_boot_path }}"
+    cmd: "arch-chroot {{ mnt_root_path }} pacman -S --noconfirm refind"
   changed_when: true
 
-- name: "Enable systemd-boot-update"
+- name: "Install rEFInd"
   ansible.builtin.command:
-    cmd: "arch-chroot {{ mnt_root_path }} systemctl enable systemd-boot-update"
-  changed_when: false
+    cmd: "arch-chroot {{ mnt_root_path }} refind-install"
+  changed_when: true
 
-- name: "Template systemd-boot files"
-  ansible.builtin.template:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-    mode: "0644"
-  loop:
-    - src: "loader.conf.j2"
-      dest: "{{ mnt_boot_path }}/loader/loader.conf"
-    - src: "archlinux.conf.j2"
-      dest: "{{ mnt_boot_path }}/loader/entries/archlinux.conf"
-
-- name: "Create distro kernel directory"
-  ansible.builtin.file:
-    path: "{{ mnt_boot_path }}/archlinux"
-    state: "directory"
-    mode: "0755"
-
-- name: "Copy kernel to efi partition"
+- name: "Configure rEFInd"
   ansible.builtin.copy:
-    src: "{{ item }}"
-    dest: "{{ mnt_boot_path }}/archlinux/"
-    remote_src: true
+    dest: "{{ mnt_root_path }}/boot/refind_linux.conf"
     mode: "0644"
-  loop:
-    - "{{ mnt_root_path }}/boot/vmlinuz-linux"
-    - "{{ mnt_root_path }}/boot/initramfs-linux.img"
-    - "{{ mnt_root_path }}/boot/initramfs-linux-fallback.img"
+    content: |
+      "Boot with defaults" "root=PARTLABEL={{ partition_root.name }} rw"
+      "Boot to terminal" "root=PARTLABEL={{ partition_root.name }} rw systemd.unit=multi-user.target"
 
-- name: "Configure pacman hook for updating kernel"
+- name: "Configure pacman hook for rEFInd kernel updates"
   ansible.builtin.copy:
-    dest: "{{ mnt_root_path }}/etc/pacman.d/100-systemd-boot.hook"
+    dest: "{{ mnt_root_path }}/etc/pacman.d/100-refind.hook"
     mode: "0644"
     content: |
       [Trigger]
       Type = Package
+      Operation = Install
       Operation = Upgrade
       Target = linux
 
       [Action]
-      Description = Updating systemd-boot
+      Description = Updating rEFInd after kernel update
       When = PostTransaction
-      Exec = /usr/bin/cp /boot/vmlinuz-linux /boot/efi/archlinux/vmlinuz-linux
-      Exec = /usr/bin/cp /boot/initramfs-linux.img /boot/efi/archlinux/initramfs-linux.img
-      Exec = /usr/bin/cp /boot/initramfs-linux-fallback.img /boot/efi/archlinux/initramfs-linux-fallback.img
+      Exec = /usr/bin/refind-install
 
 - name: "Configure pacman in chroot"
   ansible.builtin.copy:
