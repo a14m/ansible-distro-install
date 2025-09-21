@@ -69,3 +69,5 @@
     content: |
       timeout 5
       textonly true
+  # NOTE: this is skipped because the docker test doesn't have proper EFI/refind directory created
+  tags: ["molecule-notest"]
