@@ -9,9 +9,19 @@
     cmd: "genfstab -t PARTLABEL {{ mnt_root_path }} > {{ mnt_root_path }}/etc/fstab"
   changed_when: true
 
-- name: "Run bootclt"
+- name: "Clean up old Linux Boot Manager entries"
+  ansible.builtin.shell:
+    cmd: |
+      for entry in $(efibootmgr | grep "Linux Boot Manager" | cut -d'*' -f1 | tr -d 'Boot'); do
+        efibootmgr -b $entry -B
+      done
+  changed_when: false
+  failed_when: false
+
+# NOTE: bootctl is not run in chroot to workaround https://github.com/systemd/systemd/issues/36174
+- name: "Run bootctl"
   ansible.builtin.command:
-    cmd: "arch-chroot {{ mnt_root_path }} bootctl install"
+    cmd: "bootctl install --esp-path={{ mnt_boot_path }}"
   changed_when: true
 
 - name: "Enable systemd-boot-update"
@@ -24,7 +34,7 @@
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     mode: "0644"
-  with_items:
+  loop:
     - src: "loader.conf.j2"
       dest: "{{ mnt_boot_path }}/loader/loader.conf"
     - src: "archlinux.conf.j2"
@@ -34,15 +44,15 @@
   ansible.builtin.file:
     path: "{{ mnt_boot_path }}/archlinux"
     state: "directory"
-    mode: "0700"
+    mode: "0755"
 
 - name: "Copy kernel to efi partition"
   ansible.builtin.copy:
     src: "{{ item }}"
     dest: "{{ mnt_boot_path }}/archlinux/"
     remote_src: true
-    mode: "0700"
-  with_items:
+    mode: "0644"
+  loop:
     - "{{ mnt_root_path }}/boot/vmlinuz-linux"
     - "{{ mnt_root_path }}/boot/initramfs-linux.img"
     - "{{ mnt_root_path }}/boot/initramfs-linux-fallback.img"
@@ -76,7 +86,7 @@
   ansible.builtin.command:
     cmd: "arch-chroot {{ mnt_root_path }} {{ item }}"
   changed_when: true
-  with_items:
+  loop:
     - "pacman-key --init"
     - "pacman-key --populate"
     - "pacman -Syyu --noconfirm"

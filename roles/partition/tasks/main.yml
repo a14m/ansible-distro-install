@@ -37,7 +37,7 @@
   # Ensure the /mnt/path is unmounted before /mnt (respect mount tree)
   # This ensures not getting error device is busy when unmounting
   # Ignore partitions without mount_path
-  with_items: "{{
+  loop: "{{
     partition_list
     | rejectattr('mount_path', 'undefined')
     | sort(attribute='mount_path')
@@ -54,7 +54,7 @@
     part_start: "{{ item.part_start }}"
     part_end: "{{ item.part_end }}"
     state: "present"
-  with_items: "{{ partition_list }}"
+  loop: "{{ partition_list }}"
 
 - name: "Create filesystem on device: {{ partition_disk }}"
   community.general.filesystem:
@@ -65,7 +65,7 @@
     # For any other partition, only create the filesystem if partition_wipe is true
     # This is done to ensure that new install a distro won't affect other already installed systems.
     force: "{{ (item.name in [partition_swap.name, partition_root.name]) | ternary(true, partition_wipe) }}"
-  with_items: "{{ partition_list }}"
+  loop: "{{ partition_list }}"
 
 - name: "Run mkswap"
   ansible.builtin.command:
@@ -91,7 +91,7 @@
   # Ignore mounting swap partition as it's mounted using swapon
   # Ignore partitions without mount_path
   # Ensure the /mnt is mounted before /mnt/path (respect mount tree)
-  with_items: "{{
+  loop: "{{
     partition_list
     | difference([partition_swap])
     | rejectattr('mount_path', 'undefined')
