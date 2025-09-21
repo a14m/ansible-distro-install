@@ -31,7 +31,7 @@
     dest: "{{ item.dest }}"
     mode: "0640"
     content: "{{ item.content }}"
-  with_items:
+  loop:
     - dest: "{{ mnt_root_path }}/etc/apt/preferences.d/ignored-package"
       content: "{{ bootstrap_apt_ignored_preferences }}"
     - dest: "{{ mnt_root_path }}/etc/apt/sources.list"
@@ -53,7 +53,7 @@
   ansible.builtin.command:
     cmd: "arch-chroot {{ mnt_root_path }} {{ item }}"
   changed_when: true
-  with_items:
+  loop:
     - "apt-get update"
     - "apt-get install -y {{ bootstrap_distro.packages | join(' ') }}"
 
@@ -74,7 +74,7 @@
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     mode: "0644"
-  with_items:
+  loop:
     - src: "raspberry.config.j2"
       dest: "{{ mnt_boot_path }}/config.txt"
     - src: "raspberry.cmdline.j2"
