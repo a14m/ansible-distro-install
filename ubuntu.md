@@ -18,7 +18,7 @@
 ```bash
 passwd
 nmcli dev wifi connect <SSID> password <PASSPHRASE>
-sudo hostnamectl set-hostname ubuntuiso.local
+sudo hostnamectl set-hostname ubuntuiso
 sudo apt update
 sudo DEBIAN_FRONTEND=noninteractive apt install -y openssh-server
 sudo systemctl restart ssh avahi-daemon
