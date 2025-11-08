@@ -8,7 +8,7 @@
     - role: "configure"
   tasks:
     - name: "Reboot"
-      ansible.builtin.command: "reboot"
+      ansible.builtin.command: "reboot -f"
       async: 1
       poll: 0
       changed_when: true
