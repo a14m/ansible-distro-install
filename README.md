@@ -1,6 +1,6 @@
-# Ansible Distro Install Playbooks
+# Ansible Linux Distro Install
 
-Ansible roles and playbooks to install different *nix distros.
+Ansible roles and playbooks to install different linux distros.
 
 ## Prerequisite
 
