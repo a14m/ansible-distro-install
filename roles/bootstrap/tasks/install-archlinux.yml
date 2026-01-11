@@ -1,4 +1,14 @@
 ---
+- name: "Refresh live environment pacman keyring"
+  ansible.builtin.command:
+    cmd: "{{ item }}"
+  changed_when: true
+  failed_when: false
+  loop:
+    - "pacman-key --init"
+    - "pacman-key --populate"
+    - "pacman-key --refresh-keys"
+
 - name: "Run pacstrap"
   ansible.builtin.command:
     cmd: "pacstrap -K {{ mnt_root_path }} base linux linux-firmware"
