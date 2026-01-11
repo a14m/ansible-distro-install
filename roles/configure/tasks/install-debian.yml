@@ -1,7 +1,0 @@
----
-- name: "Ensure ansible dependencies are installed on live environment"
-  ansible.builtin.apt:
-    state: "present"
-    pkg:
-      - "python3"
-      - "python3-pip"

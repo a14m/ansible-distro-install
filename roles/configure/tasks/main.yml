@@ -3,22 +3,10 @@
   ansible.builtin.set_fact:
     configure_chroot_path: "{{ partition_root.mount_path }}"
 
-- name: "Install archlinux"
-  ansible.builtin.include_tasks: "install-archlinux.yml"
-  when: ansible_os_family == "Archlinux"
-
-- name: "Install debian"
-  ansible.builtin.include_tasks: "install-debian.yml"
-  when: ansible_os_family == "Debian"
-
-- name: "Install ansible-core on live environment"
-  # Can't install ansible-core using package manager
-  # This resolve the "ERROR! ansible-galaxy requires resolvelib<1.1.1,>=0.5.3"
-  # where the python-resolvelib was updated but ansible package wasn't in the package managers
-  ansible.builtin.pip:
-    name: "ansible-core>=2.18"
-    state: "present"
-    break_system_packages: true
+# After giving up on fixing the ansible.builtin.pip directly
+# Workaround ansible install not working without reinstalling and configuring pip externally
+- name: "Install ansible"
+  ansible.builtin.include_tasks: "install-ansible.yml"
 
 - name: "Run distro-configure playbooks on bootstrapped distro"
   when: configure_playbook_dir is defined

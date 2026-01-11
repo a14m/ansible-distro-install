@@ -1,8 +1,0 @@
----
-- name: "Ensure ansible dependencies are installed on live environment"
-  community.general.pacman:
-    name:
-      - "python3"
-      - "python-pip"
-    state: present
-    update_cache: true

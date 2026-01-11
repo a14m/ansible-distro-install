@@ -1,0 +1,37 @@
+---
+- name: "Ensure ansible dependencies are installed on live environment"
+  community.general.pacman:
+    name:
+      - "python3"
+      - "python-packaging"
+    state: present
+  when: ansible_os_family == "Archlinux"
+
+- name: "Ensure ansible dependencies are installed on live environment"
+  ansible.builtin.apt:
+    pkg:
+      - "python3"
+      - "python3-packaging"
+    state: "present"
+  when: ansible_os_family == "Debian"
+
+# Workaround ansible.builtin.pip not working on live environment,
+# after giving up on fixing it, now we install pip manually and use the commands to setup ansible
+- name: "Download get-pip.py"
+  ansible.builtin.get_url:
+    url: "https://bootstrap.pypa.io/get-pip.py"
+    dest: "/tmp/get-pip.py"
+    mode: "0644"
+
+- name: "Bootstrap pip with break-system-packages"
+  ansible.builtin.command:
+    cmd: "python3 /tmp/get-pip.py --break-system-packages --force-reinstall --root-user-action=ignore"
+  changed_when: true
+
+- name: "Install ansible-core on live environment"
+  # Can't install ansible-core using package manager
+  # This resolve the "ERROR! ansible-galaxy requires resolvelib<1.1.1,>=0.5.3"
+  # where the python-resolvelib was updated but ansible package wasn't in the package managers
+  ansible.builtin.command:
+    cmd: "python3 -m pip install ansible-core>=2.18 --break-system-packages --root-user-action=ignore"
+  changed_when: true
