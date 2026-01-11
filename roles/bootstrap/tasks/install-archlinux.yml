@@ -1,4 +1,13 @@
 ---
+- name: "Update live environment"
+  ansible.builtin.command:
+    cmd: "{{ item }}"
+  loop:
+    - "pacman -Syu --noconfirm"
+    - "pacman -Sy --needed archlinux-keyring --noconfirm"
+  changed_when: true
+  failed_when: false
+
 - name: "Run pacstrap"
   ansible.builtin.command:
     cmd: "pacstrap -K {{ mnt_root_path }} base linux linux-firmware"
