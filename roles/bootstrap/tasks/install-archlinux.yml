@@ -83,3 +83,29 @@
   ansible.builtin.command:
     cmd: "arch-chroot {{ mnt_root_path }} pacman -S --noconfirm python3"
   changed_when: true
+
+- name: "Install broadcom-wl driver"
+  ansible.builtin.command:
+    cmd: "arch-chroot {{ mnt_root_path }} pacman -S --noconfirm broadcom-wl"
+  changed_when: true
+  when: bootstrap_broadcom_wl
+
+- name: "Blacklist modules conflicting with broadcom-wl"
+  ansible.builtin.copy:
+    dest: "{{ mnt_root_path }}/etc/modprobe.d/broadcom-wl.conf"
+    mode: "0644"
+    content: |
+      blacklist brcmfmac
+      blacklist brcmutil
+      blacklist b43
+      blacklist ssb
+      blacklist bcma
+  when: bootstrap_broadcom_wl
+
+- name: "Load wl module at boot"
+  ansible.builtin.copy:
+    dest: "{{ mnt_root_path }}/etc/modules-load.d/broadcom-wl.conf"
+    mode: "0644"
+    content: |
+      wl
+  when: bootstrap_broadcom_wl
