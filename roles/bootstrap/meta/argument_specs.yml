@@ -14,3 +14,8 @@ argument_specs:
         type: "dict"
         required: true
         description: "Check partition_root argument in role: partition, required options: mount_path"
+      bootstrap_broadcom_wl:
+        type: "bool"
+        required: false
+        default: false
+        description: "Install broadcom-wl driver (required for BCM4360 on Intel 2012 Macs)"
