@@ -1,5 +1,5 @@
 ---
-hostname: "mac-archlinux.local"
+hostname: "mac.local"
 partition_disk: "/dev/sda"
 partition_wipe: false
 partition_boot:
