@@ -43,3 +43,4 @@ partition_extras:
     part_end: "100%"
     fstype: "ext4"
     dev: "{{ partition_disk }}4"
+configure_playbook_dir: "../ansible-distro-configure"

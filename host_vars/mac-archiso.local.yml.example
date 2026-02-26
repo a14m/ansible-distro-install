@@ -44,3 +44,4 @@ partition_extras:
     fstype: "ext4"
     dev: "{{ partition_disk }}4"
 bootstrap_broadcom_wl: true
+configure_playbook_dir: "../ansible-distro-configure"
