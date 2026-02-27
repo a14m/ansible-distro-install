@@ -46,20 +46,16 @@
   changed_when: true
 
 - name: "Configure rEFInd boot options"
-  ansible.builtin.copy:
+  ansible.builtin.template:
+    src: "refind_linux.conf.j2"
     dest: "{{ mnt_root_path }}/boot/refind_linux.conf"
     mode: "0644"
-    content: |
-      "Boot with defaults" "root=PARTLABEL={{ partition_root.name }} rw console=tty1"
-      "Boot to terminal" "root=PARTLABEL={{ partition_root.name }} rw console=tty1 systemd.unit=multi-user.target"
 
 - name: "Configure rEFInd settings"
-  ansible.builtin.copy:
+  ansible.builtin.template:
+    src: "refind.conf.j2"
     dest: "{{ mnt_boot_path }}/EFI/refind/refind.conf"
     mode: "0644"
-    content: |
-      timeout 5
-      textonly true
   # NOTE: this is skipped because the docker test doesn't have proper EFI/refind directory created
   tags: ["molecule-notest"]
 
@@ -88,7 +84,7 @@
   ansible.builtin.command:
     cmd: "arch-chroot {{ mnt_root_path }} pacman -S --noconfirm broadcom-wl"
   changed_when: true
-  when: bootstrap_broadcom_wl
+  when: bootstrap_mac
 
 - name: "Blacklist modules conflicting with broadcom-wl"
   ansible.builtin.copy:
@@ -100,7 +96,7 @@
       blacklist b43
       blacklist ssb
       blacklist bcma
-  when: bootstrap_broadcom_wl
+  when: bootstrap_mac
 
 - name: "Load wl module at boot"
   ansible.builtin.copy:
@@ -108,4 +104,4 @@
     mode: "0644"
     content: |
       wl
-  when: bootstrap_broadcom_wl
+  when: bootstrap_mac

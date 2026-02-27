@@ -14,8 +14,13 @@ argument_specs:
         type: "dict"
         required: true
         description: "Check partition_root argument in role: partition, required options: mount_path"
-      bootstrap_broadcom_wl:
+      bootstrap_mac:
         type: "bool"
         required: false
         default: false
-        description: "Install broadcom-wl driver (required for BCM4360 on Intel 2012 Macs)"
+        description: "Install broadcom-wl driver/spoof_osx (required for Intel 2012 Macs)"
+      bootstrap_mac_boot_args:
+        type: "str"
+        required: false
+        default: "acpi_osi=Darwin i915.modeset=1 acpi_mask_gpe=0x06"
+        description: "Extra kernel boot arguments appended to rEFInd boot entries when bootstrap_mac is true"

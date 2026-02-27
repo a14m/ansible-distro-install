@@ -1,0 +1,2 @@
+"Boot with defaults" "root=PARTLABEL={{ partition_root.name }} rw console=tty1{% if bootstrap_mac %} {{ bootstrap_mac_boot_args }}{% endif %}"
+"Boot to terminal" "root=PARTLABEL={{ partition_root.name }} rw console=tty1 systemd.unit=multi-user.target{% if bootstrap_mac %} {{ bootstrap_mac_boot_args }}{% endif %}"
