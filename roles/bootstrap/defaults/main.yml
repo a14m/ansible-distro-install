@@ -1,2 +1,3 @@
 ---
-bootstrap_broadcom_wl: false
+bootstrap_mac: false
+bootstrap_mac_boot_args: "acpi_osi=Darwin i915.modeset=1 acpi_mask_gpe=0x06"
