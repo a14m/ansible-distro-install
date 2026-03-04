@@ -24,7 +24,7 @@ dhcpcd wlan0
 **Mac Example:**
 
 ```bash
-hostnamectl set-hostname mac-archiso.local
+hostnamectl set-hostname marchiso.local
 passwd
 rmmod b43 ssb bcma wl
 modprobe wl
