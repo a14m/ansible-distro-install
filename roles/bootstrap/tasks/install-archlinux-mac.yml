@@ -1,0 +1,72 @@
+---
+# Apple EFI 1.x does not expose ext4 volumes via SimpleFileSystem, so the
+# kernel must live on the FAT32 EFI partition where rEFInd already scans \boot\.
+- name: "Ensure boot directory exists on EFI partition"
+  ansible.builtin.file:
+    path: "{{ mnt_boot_path }}/boot"
+    state: directory
+    mode: "0755"
+
+- name: "Copy kernel to EFI partition"
+  ansible.builtin.copy:
+    src: "{{ mnt_root_path }}/boot/{{ item }}"
+    dest: "{{ mnt_boot_path }}/boot/{{ item }}"
+    remote_src: true
+    mode: "0644"
+  loop:
+    - "vmlinuz-linux"
+    - "initramfs-linux.img"
+
+- name: "Configure rEFInd boot options on EFI partition"
+  ansible.builtin.template:
+    src: "refind_linux.conf.j2"
+    dest: "{{ mnt_boot_path }}/boot/refind_linux.conf"
+    mode: "0644"
+
+- name: "Install kernel sync script for EFI partition"
+  ansible.builtin.copy:
+    dest: "{{ mnt_root_path }}/usr/local/bin/refind-sync-kernel"
+    mode: "0755"
+    content: |
+      #!/bin/sh
+      cp /boot/vmlinuz-linux /boot/efi/boot/
+      cp /boot/initramfs-linux.img /boot/efi/boot/
+
+- name: "Override pacman hook to sync kernel to EFI partition"
+  ansible.builtin.copy:
+    dest: "{{ mnt_root_path }}/etc/pacman.d/100-refind.hook"
+    mode: "0644"
+    content: |
+      [Trigger]
+      Type = Package
+      Operation = Install
+      Operation = Upgrade
+      Target = linux
+
+      [Action]
+      Description = Syncing kernel to EFI partition after kernel update
+      When = PostTransaction
+      Exec = /usr/local/bin/refind-sync-kernel
+
+- name: "Install broadcom-wl driver"
+  ansible.builtin.command:
+    cmd: "arch-chroot {{ mnt_root_path }} pacman -S --noconfirm broadcom-wl"
+  changed_when: true
+
+- name: "Blacklist modules conflicting with broadcom-wl"
+  ansible.builtin.copy:
+    dest: "{{ mnt_root_path }}/etc/modprobe.d/broadcom-wl.conf"
+    mode: "0644"
+    content: |
+      blacklist brcmfmac
+      blacklist brcmutil
+      blacklist b43
+      blacklist ssb
+      blacklist bcma
+
+- name: "Load wl module at boot"
+  ansible.builtin.copy:
+    dest: "{{ mnt_root_path }}/etc/modules-load.d/broadcom-wl.conf"
+    mode: "0644"
+    content: |
+      wl
