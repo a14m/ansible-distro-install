@@ -42,6 +42,7 @@ partition_extras:
     part_start: "109.0GiB"
     part_end: "100%"
     fstype: "ext4"
-    dev: "{{ partition_disk }}4"
+    dev: "{{ partition_disk }}5"
+    mount_path: "/mnt/home"
 bootstrap_mac: true
 configure_playbook_dir: "../ansible-distro-configure"
