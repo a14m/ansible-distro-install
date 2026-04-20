@@ -55,12 +55,10 @@
   changed_when: true
 
 - name: "Configure rEFInd boot options"
-  ansible.builtin.copy:
+  ansible.builtin.template:
+    src: "refind_linux.conf.j2"
     dest: "{{ mnt_root_path }}/boot/refind_linux.conf"
     mode: "0644"
-    content: |
-      "Boot with defaults" "root=PARTLABEL={{ partition_root.name }} rw"
-      "Boot to terminal" "root=PARTLABEL={{ partition_root.name }} rw systemd.unit=multi-user.target"
 
 - name: "Configure rEFInd settings"
   ansible.builtin.copy:
