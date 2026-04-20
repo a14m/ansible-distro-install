@@ -16,9 +16,36 @@
 **Example:**
 
 ```bash
+sudo hostnamectl set-hostname ubuntuiso
 passwd
 nmcli dev wifi connect <SSID> password <PASSPHRASE>
-sudo hostnamectl set-hostname ubuntuiso
+sudo apt update
+sudo DEBIAN_FRONTEND=noninteractive apt install -y openssh-server
+sudo systemctl restart ssh avahi-daemon
+```
+
+**Mac Example:**
+
+On a machine with internet connection, download the Apple missing drivers dependencies
+
+- Get the kernel version from the live ISO (ex. `uname -r`)
+- Use the kernel version to download dependencies (ex. `./hack/ubuntu/mac-drivers.sh 6.11.0-17-generic`)
+- Copy downloaded dependencies (in `/tmp/bcmwl-drivers`) to the USB
+
+On the Ubuntu Live ISO
+
+```bash
+sudo mkdir /media/usb
+lsblk
+sudo mount /dev/sdX1 /media/usb
+cp -r /media/usb/bcmwl-drivers /tmp/bcmwl
+bash /tmp/bcmwl/install-wl.sh  /tmp/bcmwl
+
+ip link
+hostnamectl set-hostname mubuntuiso
+passwd
+nmcli dev wifi connect <SSID> password <PASSPHRASE>
+dhcpcd wlps3s0
 sudo apt update
 sudo DEBIAN_FRONTEND=noninteractive apt install -y openssh-server
 sudo systemctl restart ssh avahi-daemon
