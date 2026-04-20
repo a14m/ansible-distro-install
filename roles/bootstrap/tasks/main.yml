@@ -20,6 +20,9 @@
     - name: "Install ubuntu"
       ansible.builtin.include_tasks: "install-ubuntu.yml"
       when: ansible_facts['distribution'] == "Ubuntu"
+    - name: "Install ubuntu on Mac"
+      ansible.builtin.include_tasks: "install-ubuntu-mac.yml"
+      when: ansible_facts['distribution'] == "Ubuntu" and bootstrap_mac
 
     - name: "Install raspberry"
       ansible.builtin.include_tasks: "install-raspberry.yml"
