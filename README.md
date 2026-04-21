@@ -22,7 +22,7 @@ Ex. `rm .gitattributes && cp host_vars/ubuntuiso.local.yml.example host_vars/ubu
 ## Boot distro live image
 
 - [Arch Linux](./archlinux.md)
-- [Debian Ubuntu](./ubuntu.md)
+- [Debian/Ubuntu](./ubuntu.md)
 - [Raspberry PI 5](./raspberry.md)
 
 ## Playbook: distro-install
@@ -41,7 +41,7 @@ cp /opt/distro-install/host_vars/${DISTRO}iso.local.yml.example /opt/distro-inst
 cd /opt/distro-install
 ansible-galaxy install -r requirements.yml
 
-ansible-playbook site.yml --ask-pass --limit ${HOST}
+ansible-playbook site.yml --ask-pass --limit ${HOSTNAME}
 ```
 
 ## Playbook: distro-configure
@@ -57,12 +57,12 @@ git clone https://git.sr.ht/~a14m/ansible-distro-install /opt/distro-install
 cp /opt/distro-install/host_vars/${DISTRO}iso.local.yml.example /opt/distro-install/host_vars/${DISTRO}iso.local.yml
 
 git clone https://git.sr.ht/~a14m/ansible-distro-configure /opt/distro-configure
-cp /opt/distro-configure/host_vars/${DISTRO}.local.yml.example /opt/distro-configure/host_vars/${DISTRO}.local.yml
+cp /opt/distro-configure/host_vars/${HOSTNAME}.yml.example /opt/distro-configure/host_vars/${HOSTNAME}.yml
 
 cd /opt/distro-install
 ansible-galaxy install -r requirements.yml
 
-ansible-playbook site.yml --ask-pass --limit ${HOST} --extra-vars '{"configure_playbook_dir":"/opt/distro-configure"}'
+ansible-playbook site.yml --ask-pass --limit ${HOSTNAME} --extra-vars '{"configure_playbook_dir":"/opt/distro-configure"}'
 ```
 
 ## Special Thanks to
