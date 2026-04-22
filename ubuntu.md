@@ -7,16 +7,16 @@
 - Boot the `ubuntu` live image from a bootable USB
 - Connect to wireless network (if not connected via LAN)
 - Set root password (which will be asked to run the install playbook)
-- Set the hostname to `ubuntuiso.local`
+- Set the host name `ubuntu-<MACHINE>-iso.local`
 - Install and configure ssh
-- `cp host_vars/ubuntuiso.local.example host_vars/ubuntuiso.local`
-- Update the `host_vars/ubuntuiso.local` file
+- `cp host_vars/ubuntu-<MACHINE>-iso.local.example host_vars/ubuntu-<MACHINE>-iso.local`
+- Update the `host_vars/ubuntu-<MACHINE>-iso.local` file
 - Run the playbook on the ansible controller
 
 **Example:**
 
 ```bash
-sudo hostnamectl set-hostname ubuntuiso
+sudo hostnamectl set-hostname ubuntu-<MACHINE>-iso
 passwd
 nmcli dev wifi connect <SSID> password <PASSPHRASE>
 sudo apt update
@@ -42,10 +42,9 @@ cp -r /media/usb/bcmwl-drivers /tmp/bcmwl
 bash /tmp/bcmwl/install-wl.sh  /tmp/bcmwl
 
 ip link
-hostnamectl set-hostname mubuntuiso
+hostnamectl set-hostname ubuntu-macbook-iso.local
 passwd
 nmcli dev wifi connect <SSID> password <PASSPHRASE>
-sudo dhcpcd wlp3s0
 sudo apt update
 sudo DEBIAN_FRONTEND=noninteractive apt install -y openssh-server
 sudo systemctl restart ssh avahi-daemon
