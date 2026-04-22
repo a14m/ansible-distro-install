@@ -45,7 +45,7 @@ ip link
 hostnamectl set-hostname mubuntuiso
 passwd
 nmcli dev wifi connect <SSID> password <PASSPHRASE>
-dhcpcd wlps3s0
+sudo dhcpcd wlp3s0
 sudo apt update
 sudo DEBIAN_FRONTEND=noninteractive apt install -y openssh-server
 sudo systemctl restart ssh avahi-daemon
