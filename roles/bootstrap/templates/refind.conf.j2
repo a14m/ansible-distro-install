@@ -1,5 +1,10 @@
 timeout 5
 textonly true
+scan_all_linux_kernels false
+dont_scan_files vmlinuz,vmlinuz-linux,initrd.img,initramfs-linux.img
+hideui hints
 {% if bootstrap_mac %}
 spoof_osx_version 12.7
 {% endif %}
+include ubuntu.conf
+include arch.conf

@@ -35,29 +35,57 @@
     - "pacman-key --populate"
     - "pacman -Syyu --noconfirm"
 
-- name: "Ensure rEFInd bootloader installed"
+- name: "Ensure rEFInd package installed"
   ansible.builtin.command:
     cmd: "arch-chroot {{ mnt_root_path }} pacman -S --noconfirm refind"
   changed_when: true
 
-- name: "Install rEFInd"
+- name: "Install rEFInd to EFI partition"
   ansible.builtin.command:
     cmd: "arch-chroot {{ mnt_root_path }} refind-install"
   changed_when: true
 
-- name: "Configure rEFInd boot options"
-  ansible.builtin.template:
-    src: "refind_linux.conf.j2"
-    dest: "{{ mnt_root_path }}/boot/refind_linux.conf"
-    mode: "0644"
-
-- name: "Configure rEFInd settings"
+- name: "Configure rEFInd base settings"
   ansible.builtin.template:
     src: "refind.conf.j2"
     dest: "{{ mnt_boot_path }}/EFI/refind/refind.conf"
     mode: "0644"
   # NOTE: this is skipped because the docker test doesn't have proper EFI/refind directory created
   tags: ["molecule-notest"]
+
+- name: "Ensure arch EFI boot directory exists"
+  ansible.builtin.file:
+    path: "{{ mnt_boot_path }}/EFI/arch"
+    state: directory
+    mode: "0755"
+
+- name: "Copy kernel to EFI partition"
+  ansible.builtin.copy:
+    src: "{{ mnt_root_path }}/boot/{{ item }}"
+    dest: "{{ mnt_boot_path }}/EFI/arch/{{ item }}"
+    remote_src: true
+    mode: "0644"
+  loop:
+    - "vmlinuz-linux"
+    - "initramfs-linux.img"
+
+- name: "Configure Arch Linux boot entries"
+  ansible.builtin.template:
+    src: "refind_arch.conf.j2"
+    dest: "{{ mnt_boot_path }}/EFI/refind/arch.conf"
+    mode: "0644"
+  # NOTE: this is skipped because the docker test doesn't have proper EFI/refind directory created
+  tags: ["molecule-notest"]
+
+- name: "Install kernel sync script for EFI partition"
+  ansible.builtin.copy:
+    dest: "{{ mnt_root_path }}/usr/local/bin/refind-sync-kernel"
+    mode: "0755"
+    content: |
+      #!/bin/sh
+      mkdir -p /boot/efi/EFI/arch
+      cp /boot/vmlinuz-linux /boot/efi/EFI/arch/
+      cp /boot/initramfs-linux.img /boot/efi/EFI/arch/
 
 - name: "Configure pacman hook for rEFInd kernel updates"
   ansible.builtin.copy:
@@ -71,9 +99,9 @@
       Target = linux
 
       [Action]
-      Description = Updating rEFInd after kernel update
+      Description = Syncing kernel to EFI partition after kernel update
       When = PostTransaction
-      Exec = /usr/bin/refind-install
+      Exec = /usr/local/bin/refind-sync-kernel
 
 - name: "Ensure ansible dependencies are installed in chroot"
   ansible.builtin.command:
