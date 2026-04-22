@@ -44,28 +44,61 @@
     - "apt-get update"
     - "apt-get install -y {{ bootstrap_distro.packages | join(' ') }}"
 
-- name: "Ensure rEFInd bootloader installed"
+- name: "Ensure rEFInd package installed"
   ansible.builtin.command:
     cmd: "arch-chroot {{ mnt_root_path }} apt-get install -y refind"
   changed_when: true
 
-- name: "Install rEFInd"
+- name: "Install rEFInd to EFI partition"
   ansible.builtin.command:
     cmd: "arch-chroot {{ mnt_root_path }} refind-install"
   changed_when: true
 
-- name: "Configure rEFInd boot options"
+- name: "Configure rEFInd base settings"
   ansible.builtin.template:
-    src: "refind_linux.conf.j2"
-    dest: "{{ mnt_root_path }}/boot/refind_linux.conf"
-    mode: "0644"
-
-- name: "Configure rEFInd settings"
-  ansible.builtin.copy:
+    src: "refind.conf.j2"
     dest: "{{ mnt_boot_path }}/EFI/refind/refind.conf"
     mode: "0644"
-    content: |
-      timeout 5
-      textonly true
   # NOTE: this is skipped because the docker test doesn't have proper EFI/refind directory created
   tags: ["molecule-notest"]
+
+- name: "Ensure ubuntu EFI boot directory exists"
+  ansible.builtin.file:
+    path: "{{ mnt_boot_path }}/EFI/ubuntu"
+    state: directory
+    mode: "0755"
+
+- name: "Copy kernel to EFI partition"
+  ansible.builtin.copy:
+    src: "{{ mnt_root_path }}/boot/{{ item }}"
+    dest: "{{ mnt_boot_path }}/EFI/ubuntu/{{ item }}"
+    remote_src: true
+    follow: true
+    mode: "0644"
+  loop:
+    - "vmlinuz"
+    - "initrd.img"
+
+- name: "Configure Ubuntu boot entries"
+  ansible.builtin.template:
+    src: "refind_ubuntu.conf.j2"
+    dest: "{{ mnt_boot_path }}/EFI/refind/ubuntu.conf"
+    mode: "0644"
+  # NOTE: this is skipped because the docker test doesn't have proper EFI/refind directory created
+  tags: ["molecule-notest"]
+
+- name: "Ensure kernel post-install hook directory exists"
+  ansible.builtin.file:
+    path: "{{ mnt_root_path }}/etc/kernel/postinst.d"
+    state: directory
+    mode: "0755"
+
+- name: "Install kernel sync script for EFI partition"
+  ansible.builtin.copy:
+    dest: "{{ mnt_root_path }}/etc/kernel/postinst.d/refind-sync-kernel"
+    mode: "0755"
+    content: |
+      #!/bin/sh
+      mkdir -p /boot/efi/EFI/ubuntu
+      cp /boot/vmlinuz /boot/efi/EFI/ubuntu/
+      cp /boot/initrd.img /boot/efi/EFI/ubuntu/
