@@ -1,5 +1,5 @@
 ---
-hostname: "ubuntu.local"
+hostname: "desktop.local"
 partition_disk: "/dev/nvme0n1"
 partition_wipe: true
 partition_boot:

@@ -1,5 +1,5 @@
 ---
-hostname: "marchlinux.local"
+hostname: "macbook.local"
 partition_disk: "/dev/sda"
 partition_wipe: false
 partition_boot:
@@ -23,20 +23,20 @@ partition_swap:
   dev: "{{ partition_disk }}2"
   mount_path: "none"
 partition_root:
-  num: 4
-  name: "arch-root"
-  part_start: "59.0GiB"
-  part_end: "109.0GiB"
+  num: 3
+  name: "ubuntu-root"
+  part_start: "9.0GiB"
+  part_end: "59.0GiB"
   fstype: "ext4"
-  dev: "{{ partition_disk }}4"
+  dev: "{{ partition_disk }}3"
   mount_path: "/mnt"
 partition_extras:
-  - num: 3
-    name: "ubuntu-root"
-    part_start: "9.0GiB"
-    part_end: "59.0GiB"
+  - num: 4
+    name: "arch-root"
+    part_start: "59.0GiB"
+    part_end: "109.0GiB"
     fstype: "ext4"
-    dev: "{{ partition_disk }}3"
+    dev: "{{ partition_disk }}4"
   - num: 5
     name: "home"
     part_start: "109.0GiB"
