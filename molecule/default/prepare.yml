@@ -6,8 +6,8 @@
     - name: "Set distro test host name mapping"
       ansible.builtin.set_fact:
         distro_hostname_mapping:
-          archlinux: "archlinux.local"
-          ubuntu: "ubuntu.local"
+          archlinux: "desktop.local"
+          ubuntu: "laptop.local"
           raspberrypi: "rpi5.local"
 
     - name: "Create virtual disk image"
