@@ -1,0 +1,100 @@
+---
+- name: "Include distribution vars"
+  ansible.builtin.include_vars: "proxmox.yml"
+
+- name: "Ensure install dependencies are installed on live environment"
+  ansible.builtin.apt:
+    state: "present"
+    update_cache: true
+    pkg:
+      - "debootstrap"
+      - "arch-install-scripts"
+      - "bash"
+
+- name: "Run debootstrap"
+  ansible.builtin.command:
+    cmd: "debootstrap
+      {{ bootstrap_opts }}
+      {{ bootstrap_distro.name }}
+      {{ mnt_root_path }}
+      {{ bootstrap_distro.mirror_url }}"
+  changed_when: true
+
+- name: "Generate fstab"
+  ansible.builtin.shell:
+    cmd: "genfstab -t PARTLABEL {{ mnt_root_path }} > {{ mnt_root_path }}/etc/fstab"
+  changed_when: true
+
+- name: "Download Proxmox repo signing key"
+  ansible.builtin.get_url:
+    url: "https://enterprise.proxmox.com/debian/proxmox-release-bookworm.gpg"
+    dest: "{{ mnt_root_path }}/etc/apt/trusted.gpg.d/proxmox-release-bookworm.gpg"
+    mode: "0644"
+
+- name: "Configure apt in chroot"
+  ansible.builtin.copy:
+    dest: "{{ item.dest }}"
+    mode: "0640"
+    content: "{{ item.content }}"
+  loop:
+    - dest: "{{ mnt_root_path }}/etc/apt/preferences.d/ignored-package"
+      content: "{{ bootstrap_apt_ignored_preferences }}"
+    - dest: "{{ mnt_root_path }}/etc/apt/sources.list"
+      content: "{{ bootstrap_apt_sources }}"
+    - dest: "{{ mnt_root_path }}/etc/apt/sources.list.d/pve-no-subscription.list"
+      content: "{{ bootstrap_proxmox_apt_sources }}"
+
+- name: "Configure system in chroot"
+  ansible.builtin.command:
+    cmd: "arch-chroot {{ mnt_root_path }} {{ item }}"
+  changed_when: true
+  loop:
+    - "apt-get update"
+    - "apt-get install -y {{ bootstrap_distro.packages | join(' ') }}"
+
+- name: "Ensure rEFInd package installed"
+  ansible.builtin.command:
+    cmd: "arch-chroot {{ mnt_root_path }} apt-get install -y refind"
+  changed_when: true
+
+- name: "Install rEFInd to EFI partition"
+  ansible.builtin.command:
+    cmd: "arch-chroot {{ mnt_root_path }} refind-install"
+  changed_when: true
+
+- name: "Ensure proxmox EFI boot directory exists"
+  ansible.builtin.file:
+    path: "{{ mnt_boot_path }}/EFI/proxmox"
+    state: directory
+    mode: "0755"
+
+- name: "Copy kernel to EFI partition"
+  ansible.builtin.shell:
+    cmd: |
+      cp {{ mnt_root_path }}/boot/vmlinuz-*-pve {{ mnt_boot_path }}/EFI/proxmox/vmlinuz
+      cp {{ mnt_root_path }}/boot/initrd.img-*-pve {{ mnt_boot_path }}/EFI/proxmox/initrd.img
+  changed_when: true
+
+- name: "Configure rEFInd"
+  ansible.builtin.template:
+    src: "refind_proxmox.conf.j2"
+    dest: "{{ mnt_boot_path }}/EFI/BOOT/refind.conf"
+    mode: "0644"
+  # NOTE: this is skipped because the docker test doesn't have proper EFI/refind directory created
+  # NOTE: Debian's refind-install falls back to EFI/BOOT/ when NVRAM entries can't be registered in chroot
+  tags: ["molecule-notest"]
+
+- name: "Ensure kernel post-install hook directory exists"
+  ansible.builtin.file:
+    path: "{{ mnt_root_path }}/etc/kernel/postinst.d"
+    state: directory
+    mode: "0755"
+
+- name: "Install kernel sync script for EFI partition"
+  ansible.builtin.copy:
+    dest: "{{ mnt_root_path }}/etc/kernel/postinst.d/refind-sync-kernel"
+    mode: "0755"
+    content: |
+      #!/bin/sh
+      cp $(ls -t /boot/vmlinuz-*-pve | head -1) /boot/efi/EFI/proxmox/vmlinuz
+      cp $(ls -t /boot/initrd.img-*-pve | head -1) /boot/efi/EFI/proxmox/initrd.img

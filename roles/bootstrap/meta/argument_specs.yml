@@ -24,3 +24,13 @@ argument_specs:
         required: false
         default: "acpi_osi=Darwin i915.modeset=1 acpi_mask_gpe=0x06"
         description: "Extra kernel boot arguments appended to rEFInd boot entries when bootstrap_mac is true"
+      bootstrap_pi:
+        type: "bool"
+        required: false
+        default: false
+        description: "Install Raspberry PI OS (Raspberry ISO reports as Debian)"
+      bootstrap_proxmox:
+        type: "bool"
+        required: false
+        default: false
+        description: "Install Proxmox VE (Using Debian Live ISO since Proxmox ISO lacks automation)"
