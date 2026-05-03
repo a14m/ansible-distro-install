@@ -5,10 +5,17 @@
   tasks:
     - name: "Set distro test host name mapping"
       ansible.builtin.set_fact:
-        distro_hostname_mapping:
-          archlinux: "desktop.local"
-          ubuntu: "laptop.local"
-          raspberrypi: "rpi5.local"
+        scenario_vars:
+          archlinux:
+            hostname: "desktop.local"
+          ubuntu:
+            hostname: "laptop.local"
+          raspberrypi:
+            hostname: "rpi5.local"
+            bootstrap_pi: true
+          proxmox:
+            hostname: "pve.local"
+            bootstrap_proxmox: true
 
     - name: "Create virtual disk image"
       become: true
@@ -24,10 +31,16 @@
       register: loop_device
       changed_when: true
 
+    - name: "Set distro key"
+      ansible.builtin.set_fact:
+        distro_key: "{{ lookup('ansible.builtin.env', 'MOLECULE_DISTRO') }}"
+
     - name: "Set test facts"
       ansible.builtin.set_fact:
         test_device: "{{ loop_device.stdout }}"
-        test_hostname: "{{ distro_hostname_mapping[lookup('ansible.builtin.env', 'MOLECULE_DISTRO')] }}"
+        test_hostname: "{{ scenario_vars[distro_key].hostname }}"
+        test_bootstrap_pi: "{{ scenario_vars[distro_key].bootstrap_pi | default(false) }}"
+        test_bootstrap_proxmox: "{{ scenario_vars[distro_key].bootstrap_proxmox | default(false) }}"
         cacheable: true
 
     - name: "Show test info"
