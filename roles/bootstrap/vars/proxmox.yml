@@ -1,0 +1,21 @@
+---
+bootstrap_distro:
+  name: "bookworm" # => Proxmox VE 8.x (Debian 12)
+  mirror_url: "http://deb.debian.org/debian"
+  packages:
+    - "proxmox-default-kernel"
+
+bootstrap_opts: ""
+
+bootstrap_apt_ignored_preferences: |
+  Package: grub-common grub2-common grub-pc grub-pc-bin
+  Pin: release *
+  Pin-Priority: -1
+
+bootstrap_apt_sources: |
+  deb http://deb.debian.org/debian bookworm main contrib
+  deb http://deb.debian.org/debian bookworm-updates main contrib
+  deb http://security.debian.org/debian-security bookworm-security main contrib
+
+bootstrap_proxmox_apt_sources: |
+  deb http://download.proxmox.com/debian/pve bookworm pve-no-subscription

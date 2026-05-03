@@ -26,7 +26,11 @@
 
     - name: "Install raspberry"
       ansible.builtin.include_tasks: "install-raspberry.yml"
-      when: ansible_facts['distribution'] == "Debian" and ansible_facts['architecture'] == "aarch64"
+      when: ansible_facts['distribution'] == "Debian" and bootstrap_pi
+
+    - name: "Install proxmox"
+      ansible.builtin.include_tasks: "install-proxmox.yml"
+      when: ansible_facts['distribution'] == "Debian" and bootstrap_proxmox
 
     - name: "Ensure ansible dependencies are installed in chroot"
       ansible.builtin.command:
