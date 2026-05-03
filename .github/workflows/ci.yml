@@ -35,6 +35,9 @@ jobs:
           - distro: ubuntu
             platform: "linux/amd64"
             runs_on: "ubuntu-latest"
+          - distro: proxmox
+            platform: "linux/amd64"
+            runs_on: "ubuntu-latest"
           - distro: raspberrypi
             platform: "linux/arm64/v8"
             runs_on: "ubuntu-24.04-arm"

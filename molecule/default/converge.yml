@@ -35,6 +35,8 @@
       dev: "{{ partition_disk }}p3"
       mount_path: "/mnt"
     partition_extras: []
+    bootstrap_pi: "{{ hostvars['localhost']['test_bootstrap_pi'] }}"
+    bootstrap_proxmox: "{{ hostvars['localhost']['test_bootstrap_proxmox'] }}"
     configure_playbook_dir: "../../../ansible-distro-configure"
 
   pre_tasks:
