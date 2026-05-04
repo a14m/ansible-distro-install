@@ -37,8 +37,6 @@
     mode: "0640"
     content: "{{ item.content }}"
   loop:
-    - dest: "{{ mnt_root_path }}/etc/apt/preferences.d/ignored-package"
-      content: "{{ bootstrap_apt_ignored_preferences }}"
     - dest: "{{ mnt_root_path }}/etc/apt/sources.list"
       content: "{{ bootstrap_apt_sources }}"
     - dest: "{{ mnt_root_path }}/etc/apt/sources.list.d/pve-no-subscription.list"
@@ -52,49 +50,36 @@
     - "apt-get update"
     - "apt-get install -y {{ bootstrap_distro.packages | join(' ') }}"
 
-- name: "Ensure rEFInd package installed"
+- name: "Mount EFI partition inside chroot for grub-install"
   ansible.builtin.command:
-    cmd: "arch-chroot {{ mnt_root_path }} apt-get install -y refind"
+    cmd: "mount --bind {{ mnt_boot_path }} {{ mnt_root_path }}/boot/efi"
   changed_when: true
-
-- name: "Install rEFInd to EFI partition"
-  ansible.builtin.command:
-    cmd: "arch-chroot {{ mnt_root_path }} refind-install"
-  changed_when: true
-
-- name: "Ensure proxmox EFI boot directory exists"
-  ansible.builtin.file:
-    path: "{{ mnt_boot_path }}/EFI/proxmox"
-    state: directory
-    mode: "0755"
-
-- name: "Copy kernel to EFI partition"
-  ansible.builtin.shell:
-    cmd: |
-      cp {{ mnt_root_path }}/boot/vmlinuz-*-pve {{ mnt_boot_path }}/EFI/proxmox/vmlinuz
-      cp {{ mnt_root_path }}/boot/initrd.img-*-pve {{ mnt_boot_path }}/EFI/proxmox/initrd.img
-  changed_when: true
-
-- name: "Configure rEFInd"
-  ansible.builtin.template:
-    src: "refind_proxmox.conf.j2"
-    dest: "{{ mnt_boot_path }}/EFI/BOOT/refind.conf"
-    mode: "0644"
-  # NOTE: this is skipped because the docker test doesn't have proper EFI/refind directory created
-  # NOTE: Debian's refind-install falls back to EFI/BOOT/ when NVRAM entries can't be registered in chroot
   tags: ["molecule-notest"]
 
-- name: "Ensure kernel post-install hook directory exists"
-  ansible.builtin.file:
-    path: "{{ mnt_root_path }}/etc/kernel/postinst.d"
-    state: directory
-    mode: "0755"
+- name: "Install grub to EFI partition"
+  ansible.builtin.command:
+    argv:
+      - "arch-chroot"
+      - "{{ mnt_root_path }}"
+      - "grub-install"
+      - "--target=x86_64-efi"
+      - "--efi-directory=/boot/efi"
+      - "--bootloader-id=proxmox"
+      - "--removable"
+  changed_when: true
+  # NOTE: requires real EFI partition — not available in Docker
+  # NOTE: --no-nvram used because NVRAM is not writable inside chroot
+  tags: ["molecule-notest"]
 
-- name: "Install kernel sync script for EFI partition"
-  ansible.builtin.copy:
-    dest: "{{ mnt_root_path }}/etc/kernel/postinst.d/refind-sync-kernel"
-    mode: "0755"
-    content: |
-      #!/bin/sh
-      cp $(ls -t /boot/vmlinuz-*-pve | head -1) /boot/efi/EFI/proxmox/vmlinuz
-      cp $(ls -t /boot/initrd.img-*-pve | head -1) /boot/efi/EFI/proxmox/initrd.img
+- name: "Generate grub configuration"
+  ansible.builtin.command:
+    cmd: "arch-chroot {{ mnt_root_path }} update-grub"
+  changed_when: true
+  # NOTE: requires kernel to be installed — not available in Docker test
+  tags: ["molecule-notest"]
+
+- name: "Unmount EFI partition from chroot"
+  ansible.builtin.command:
+    cmd: "umount {{ mnt_root_path }}/boot/efi"
+  changed_when: true
+  tags: ["molecule-notest"]
