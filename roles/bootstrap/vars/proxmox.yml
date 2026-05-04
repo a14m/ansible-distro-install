@@ -4,13 +4,9 @@ bootstrap_distro:
   mirror_url: "http://deb.debian.org/debian"
   packages:
     - "proxmox-default-kernel"
+    - "proxmox-grub"
 
 bootstrap_opts: ""
-
-bootstrap_apt_ignored_preferences: |
-  Package: grub-common grub2-common grub-pc grub-pc-bin
-  Pin: release *
-  Pin-Priority: -1
 
 bootstrap_apt_sources: |
   deb http://deb.debian.org/debian bookworm main contrib
