@@ -32,7 +32,10 @@ jobs:
           - distro: archlinux
             platform: "linux/amd64"
             runs_on: "ubuntu-latest"
-          - distro: ubuntu
+          - distro: ubuntu-noble
+            platform: "linux/amd64"
+            runs_on: "ubuntu-latest"
+          - distro: ubuntu-resolute
             platform: "linux/amd64"
             runs_on: "ubuntu-latest"
           - distro: proxmox

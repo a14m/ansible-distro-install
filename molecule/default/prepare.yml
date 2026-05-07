@@ -8,7 +8,9 @@
         scenario_vars:
           archlinux:
             hostname: "desktop.local"
-          ubuntu:
+          ubuntu-noble:
+            hostname: "laptop.local"
+          ubuntu-resolute:
             hostname: "laptop.local"
           raspberrypi:
             hostname: "rpi5.local"
