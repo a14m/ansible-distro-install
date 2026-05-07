@@ -1,6 +1,6 @@
 ---
 bootstrap_distro:
-  name: "noble" # => Ubuntu 24.04
+  name: "{{ ansible_facts['distribution_release'] }}"
   mirror_url: "http://archive.ubuntu.com/ubuntu/"
   packages:
     - "linux-generic"
