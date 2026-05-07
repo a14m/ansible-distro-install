@@ -51,6 +51,7 @@
     - "apt-get install -y {{ bootstrap_distro.packages | join(' ') }}"
 
 - name: "Mount EFI partition inside chroot for grub-install"
+  # noqa: command-instead-of-module intentional because of chroot
   ansible.builtin.command:
     cmd: "mount --bind {{ mnt_boot_path }} {{ mnt_root_path }}/boot/efi"
   changed_when: true
@@ -79,6 +80,7 @@
   tags: ["molecule-notest"]
 
 - name: "Unmount EFI partition from chroot"
+  # noqa: command-instead-of-module intentional because of chroot
   ansible.builtin.command:
     cmd: "umount {{ mnt_root_path }}/boot/efi"
   changed_when: true
