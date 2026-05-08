@@ -44,6 +44,11 @@
     - "apt-get update"
     - "apt-get install -y {{ bootstrap_distro.packages | join(' ') }}"
 
+- name: "Replace sudo-rs with sudo in chroot"
+  ansible.builtin.command:
+    cmd: "arch-chroot {{ mnt_root_path }} apt-get install -y --allow-remove-essential sudo sudo-rs-"
+  changed_when: true
+
 - name: "Ensure rEFInd package installed"
   ansible.builtin.command:
     cmd: "arch-chroot {{ mnt_root_path }} apt-get install -y refind"
