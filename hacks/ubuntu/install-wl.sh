@@ -5,17 +5,9 @@ set -euo pipefail
 # Must be run with access to the debs downloaded by mac-drivers.sh.
 # gcc/make/binutils are extracted from the downloaded debs — not assumed pre-installed.
 #
-# Usage: bash install-wl.sh <path-to-debs-dir>
+# Usage: bash install-wl.sh
 
-usage() {
-  echo "Usage: $0 <debs-dir>"
-  echo "  debs-dir: directory containing broadcom-sta-dkms and linux-headers debs"
-  exit 1
-}
-
-[[ $# -ne 1 ]] && usage
-
-DEBS_DIR="$1"
+DEBS_DIR="$(dirname "$0")"
 KERNEL_VERSION="$(uname -r)"
 
 if [[ ! -d "$DEBS_DIR" ]]; then
@@ -49,7 +41,9 @@ sudo KBUILD_NOPEDANTIC=1 make \
 
 echo "Unloading conflicting modules..."
 sudo rmmod wl 2>/dev/null || true
-sudo rmmod b43 ssb bcma brcmfmac brcmutil 2>/dev/null || true
+for mod in b43 ssb bcma brcmfmac brcmutil; do
+  sudo rmmod "$mod" 2>/dev/null || true
+done
 
 echo "Loading wl.ko..."
 sudo insmod "$SRC_DIR/wl.ko"
