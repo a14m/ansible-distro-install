@@ -5,7 +5,6 @@
   environment:
     MAKEFLAGS: ""
   changed_when: true
-  failed_when: false
 
 - name: "Configure unconfigured packages in chroot"
   ansible.builtin.command:
@@ -13,7 +12,6 @@
   environment:
     MAKEFLAGS: ""
   changed_when: true
-  failed_when: false
 
 - name: "Blacklist modules conflicting with broadcom-wl"
   ansible.builtin.copy:
