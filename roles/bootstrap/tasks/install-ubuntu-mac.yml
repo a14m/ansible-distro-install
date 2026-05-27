@@ -1,14 +1,7 @@
 ---
-- name: "Install bcmwl-kernel-source in chroot"
+- name: "Install broadcom-sta-dkms in chroot"
   ansible.builtin.command:
-    cmd: "arch-chroot {{ mnt_root_path }} apt-get install -y bcmwl-kernel-source"
-  environment:
-    MAKEFLAGS: ""
-  changed_when: true
-
-- name: "Configure unconfigured packages in chroot"
-  ansible.builtin.command:
-    cmd: "arch-chroot {{ mnt_root_path }} dpkg --configure -a"
+    cmd: "arch-chroot {{ mnt_root_path }} apt-get install -y broadcom-sta-dkms"
   environment:
     MAKEFLAGS: ""
   changed_when: true
