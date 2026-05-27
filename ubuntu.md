@@ -16,7 +16,7 @@
 **Example:**
 
 ```bash
-sudo hostnamectl set-hostname ubuntu-<MACHINE>-iso
+hostnamectl set-hostname ubuntu-<MACHINE>-iso
 passwd
 nmcli dev wifi connect <SSID> password <PASSPHRASE>
 sudo apt update
@@ -29,8 +29,8 @@ sudo systemctl restart ssh avahi-daemon
 On a machine with internet connection, download the Apple missing drivers dependencies
 
 - Get the kernel version from the live ISO (ex. `uname -r`)
-- Use the kernel version to download dependencies (ex. `./hack/ubuntu/mac-drivers.sh 6.11.0-17-generic`)
-- Copy downloaded dependencies (in `/tmp/bcmwl-drivers`) to the USB
+- Use the distro name and kernel version to download dependencies (ex. `./hacks/ubuntu/mac-drivers.sh noble 6.11.0-17-generic`)
+- Copy downloaded dependencies (in `/tmp/bcmwl-drivers-<kernel-version>`) to the USB
 
 On the Ubuntu Live ISO
 
@@ -38,11 +38,11 @@ On the Ubuntu Live ISO
 sudo mkdir /media/usb
 lsblk
 sudo mount /dev/sdX1 /media/usb
-cp -r /media/usb/bcmwl-drivers /tmp/bcmwl
-bash /tmp/bcmwl/install-wl.sh  /tmp/bcmwl
+cp -r /media/usb/bcmwl-drivers-<kernel-version> /tmp/bcmwl
+bash /tmp/bcmwl/install-wl.sh
 
 ip link
-hostnamectl set-hostname ubuntu-macbook-iso.local
+hostnamectl set-hostname ubuntu-macbook-iso
 passwd
 nmcli dev wifi connect <SSID> password <PASSPHRASE>
 sudo apt update
