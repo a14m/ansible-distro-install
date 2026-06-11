@@ -22,4 +22,5 @@ partition_root:
   dev: "{{ partition_disk }}p2"
   mount_path: "/mnt"
 partition_extras: []
+bootstrap_pi: true
 configure_playbook_dir: "../ansible-distro-configure"
