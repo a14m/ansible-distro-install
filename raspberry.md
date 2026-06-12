@@ -3,8 +3,8 @@
 - Download [Raspberry Pi Imager](https://www.raspberrypi.com/software/)
 - Create a bootable USB using the imager
   - OS: Raspberry PI OS LITE
-  - Hostname: `rpi<Version>iso`
-  - Username/Password: `pi:raspberry`
+  - Hostname: `rpi<Version>-iso`
+  - Username/Password: `pi:<Password>`
   - Enable SSH (Use password authentication)
 - Turn off the raspberry pi and remove the SD card
 - Insert the bootable USB and turn the PI
