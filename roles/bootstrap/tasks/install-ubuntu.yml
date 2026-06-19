@@ -36,6 +36,16 @@
     - dest: "{{ mnt_root_path }}/etc/apt/sources.list"
       content: "{{ bootstrap_apt_sources }}"
 
+- name: "Ensure DNS works in chroot"
+  # debootstrap seeds /etc/resolv.conf as a symlink to the systemd-resolved stub (127.0.0.53),
+  # which is broken when /run is a tmpfs (e.g. in Docker/molecule)
+  ansible.builtin.copy:
+    src: "/etc/resolv.conf"
+    dest: "{{ mnt_root_path }}/etc/resolv.conf"
+    follow: false
+    force: true
+    mode: "0644"
+
 - name: "Configure system in chroot"
   ansible.builtin.command:
     cmd: "arch-chroot {{ mnt_root_path }} {{ item }}"
