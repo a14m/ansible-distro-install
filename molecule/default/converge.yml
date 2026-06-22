@@ -1,4 +1,38 @@
 ---
+- name: "Discover test devices"
+  hosts: localhost
+  gather_facts: false
+  vars:
+    distro_key: "{{ lookup('ansible.builtin.env', 'MOLECULE_DISTRO') }}"
+    scenario_vars:
+      archlinux:
+        hostname: "desktop.local"
+      ubuntu-noble:
+        hostname: "laptop.local"
+      ubuntu-resolute:
+        hostname: "laptop.local"
+      raspberrypi:
+        hostname: "rpi5.local"
+        bootstrap_pi: true
+      proxmox:
+        hostname: "pve.local"
+        bootstrap_proxmox: true
+  tasks:
+    - name: "Find loop device for vdd.img"
+      become: true
+      ansible.builtin.command:
+        cmd: "losetup -j /opt/vdd.img"
+      register: losetup_output
+      changed_when: false
+
+    - name: "Inject test vars into instance host"
+      ansible.builtin.add_host:
+        name: "instance"
+        test_device: "{{ losetup_output.stdout.split(':')[0] }}"
+        test_hostname: "{{ scenario_vars[distro_key].hostname }}"
+        test_bootstrap_pi: "{{ scenario_vars[distro_key].bootstrap_pi | default(false) }}"
+        test_bootstrap_proxmox: "{{ scenario_vars[distro_key].bootstrap_proxmox | default(false) }}"
+
 - name: Converge
   hosts: instance
   gather_facts: true
@@ -35,16 +69,9 @@
       dev: "{{ partition_disk }}p3"
       mount_path: "/mnt"
     partition_extras: []
-    bootstrap_pi: "{{ hostvars['localhost']['test_bootstrap_pi'] }}"
-    bootstrap_proxmox: "{{ hostvars['localhost']['test_bootstrap_proxmox'] }}"
+    bootstrap_pi: "{{ test_bootstrap_pi }}"
+    bootstrap_proxmox: "{{ test_bootstrap_proxmox }}"
     configure_playbook_dir: "../../../ansible-distro-configure"
-
-  pre_tasks:
-    - name: "Get test facts"
-      ansible.builtin.set_fact:
-        test_device: "{{ hostvars['localhost']['test_device'] }}"
-        test_hostname: "{{ hostvars['localhost']['test_hostname'] }}"
-
   roles:
     - role: partition
     - role: bootstrap

@@ -33,9 +33,6 @@ provisioner:
     ANSIBLE_ROLES_PATH: "../../roles"
   config_options:
     defaults:
-      fact_caching: jsonfile
-      fact_caching_connection: /tmp/facts_cache
-      fact_caching_timeout: 600
       callback_result_format: yaml
       interpreter_python: /usr/bin/python3
     ssh_connection:
