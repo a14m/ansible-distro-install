@@ -19,6 +19,7 @@
 hostnamectl set-hostname ubuntu-<MACHINE>-iso
 passwd
 nmcli dev wifi connect <SSID> password <PASSPHRASE>
+sudo rm /etc/apt/sources.list.d/cdrom.sources
 sudo apt update
 sudo DEBIAN_FRONTEND=noninteractive apt install -y openssh-server
 sudo systemctl restart ssh avahi-daemon
@@ -45,6 +46,7 @@ ip link
 hostnamectl set-hostname ubuntu-macbook-iso
 passwd
 nmcli dev wifi connect <SSID> password <PASSPHRASE>
+sudo rm /etc/apt/sources.list.d/cdrom.sources
 sudo apt update
 sudo DEBIAN_FRONTEND=noninteractive apt install -y openssh-server
 sudo systemctl restart ssh avahi-daemon

@@ -61,6 +61,7 @@
           ansible-playbook site.yml
             --limit "{{ hostname }}"
             --extra-vars '{"hostname":"{{ hostname }}"}'
+            --extra-vars "@/opt/ansible-distro-configure/group_vars/homelab.yml"
             --extra-vars "@/opt/ansible-distro-configure/host_vars/{{ hostname }}.yml"
             --tags 'required_for_boot'
         chdir: "/opt/ansible-distro-configure"
