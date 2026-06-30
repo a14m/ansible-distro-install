@@ -1,4 +1,28 @@
 ---
+- name: "Ensure EFI/refind directory exists for Mac NVRAM compatibility"
+  ansible.builtin.file:
+    path: "{{ mnt_boot_path }}/EFI/refind"
+    state: directory
+    mode: "0755"
+  # Mac NVRAM entries persist across disk wipes (stored in firmware) and point to EFI/refind/
+  # refind-install --usedefault only creates EFI/BOOT/ so we must create this explicitly
+  tags: ["molecule-notest"]
+
+- name: "Copy rEFInd binary to EFI/refind for Mac NVRAM entries"
+  ansible.builtin.copy:
+    src: "{{ mnt_boot_path }}/EFI/BOOT/bootx64.efi"
+    dest: "{{ mnt_boot_path }}/EFI/refind/refind_x64.efi"
+    remote_src: true
+    mode: "0644"
+  tags: ["molecule-notest"]
+
+- name: "Configure rEFInd base settings in EFI/refind for Mac NVRAM entries"
+  ansible.builtin.template:
+    src: "refind.conf.j2"
+    dest: "{{ mnt_boot_path }}/EFI/refind/refind.conf"
+    mode: "0644"
+  tags: ["molecule-notest"]
+
 - name: "Install broadcom-sta-dkms in chroot"
   ansible.builtin.command:
     cmd: "arch-chroot {{ mnt_root_path }} apt-get install -y broadcom-sta-dkms"
