@@ -3,7 +3,6 @@
   ansible.builtin.command:
     cmd: "{{ item }}"
   loop:
-    - "pacman -Syu --noconfirm"
     - "pacman -Sy --needed archlinux-keyring --noconfirm"
   changed_when: true
 
