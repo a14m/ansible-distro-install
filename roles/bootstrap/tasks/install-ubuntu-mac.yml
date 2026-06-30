@@ -23,3 +23,12 @@
     line: "wl"
     create: true
     mode: "0644"
+
+- name: "Symlink resolv.conf to systemd-resolved stub"
+  # NOTE: "Ensure DNS works in chroot" in install-ubuntu.yml copies the macOS
+  # resolv.conf which breaks internet access (DNS resolving).
+  ansible.builtin.file:
+    src: "/run/systemd/resolve/stub-resolv.conf"
+    dest: "{{ mnt_root_path }}/etc/resolv.conf"
+    state: link
+    force: true
