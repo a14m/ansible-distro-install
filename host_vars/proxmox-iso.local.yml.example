@@ -26,9 +26,17 @@ partition_swap:
 partition_root:
   num: 3
   name: "pve-root"
-  part_start: "9.0GiB"
+  part_start: "69.0GiB"
   part_end: "100%"
   fstype: "ext4"
   dev: "{{ partition_disk }}3"
   mount_path: "/mnt"
+partition_extras:
+  - num: 4
+    name: "pve-data"
+    flags: ["LVM"]
+    part_start: "69.0GiB"
+    part_end: "100%"
+    fstype: "lvm"
+    dev: "{{ partition_disk }}4"
 configure_playbook_dir: "../ansible-distro-configure"
