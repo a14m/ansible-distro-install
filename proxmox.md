@@ -7,7 +7,7 @@
 - Boot the `Debian Live ISO` live image from a bootable USB
 - Connect to wireless network (if not connected via LAN)
 - Set root password (which will be asked to run the install playbook)
-- Remove LVM Partitions signatures if any.
+- Wipe FS and remove LVM signatures if any (to release the partitions for the playbook).
 - Set the host name `proxmox-iso.local`
 - Install and configure ssh
 - `cp host_vars/proxmox-iso.local.example host_vars/proxmox-iso.local`
@@ -24,10 +24,11 @@ sudo apt update
 sudo apt install -y openssh-server
 sudo systemctl restart ssh avahi-daemon
 
+sudo wipefs -af /dev/sda?
 sudo /sbin/vgchange -an
 sudo /sbin/dmsetup remove_all --force
 ```
 
 **Mac Example:**
 
-TBD
+Not supported.
