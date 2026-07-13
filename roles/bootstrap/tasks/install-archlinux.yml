@@ -78,21 +78,17 @@
 
 - name: "Configure Arch Linux boot entries"
   ansible.builtin.template:
-    src: "refind_arch.conf.j2"
-    dest: "{{ mnt_boot_path }}/EFI/BOOT/arch.conf"
+    src: "archlinux/archlinux.conf.j2"
+    dest: "{{ mnt_boot_path }}/EFI/BOOT/archlinux.conf"
     mode: "0644"
   # NOTE: this is skipped because the docker test doesn't have proper EFI/BOOT directory created
   tags: ["molecule-notest"]
 
 - name: "Install kernel sync script for EFI partition"
-  ansible.builtin.copy:
+  ansible.builtin.template:
+    src: "archlinux/refind-sync-kernel.j2"
     dest: "{{ mnt_root_path }}/usr/local/bin/refind-sync-kernel"
     mode: "0755"
-    content: |
-      #!/bin/sh
-      mkdir -p /boot/efi/EFI/arch
-      cp /boot/vmlinuz-linux /boot/efi/EFI/arch/
-      cp /boot/initramfs-linux.img /boot/efi/EFI/arch/
 
 - name: "Configure pacman hook for rEFInd kernel updates"
   ansible.builtin.copy:

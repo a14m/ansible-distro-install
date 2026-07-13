@@ -75,9 +75,9 @@
     dest: "{{ item.dest }}"
     mode: "0644"
   loop:
-    - src: "raspberry.config.j2"
+    - src: "raspberry/raspberry.config.j2"
       dest: "{{ mnt_boot_path }}/config.txt"
-    - src: "raspberry.cmdline.j2"
+    - src: "raspberry/raspberry.cmdline.j2"
       dest: "{{ mnt_boot_path }}/cmdline.txt"
 
 - name: "Configure boot order"
