@@ -37,18 +37,18 @@
         list_files: false
         remote_src: false
 
-    - name: "Update configure playbook inventory"
+    - name: "Add chroot connection override to configure inventory"
       ansible.builtin.copy:
-        dest: "/opt/ansible-distro-configure/inventory/hosts.yml"
+        dest: "/opt/ansible-distro-configure/inventory/chroot.yml"
         mode: "0640"
         content: |
-          {{ hostname }}:
-            vars:
-              ansible_user: "root"
-              ansible_connection: "chroot"
-              ansible_chroot_exe: "arch-chroot"
+          homelab:
             hosts:
-              {{ configure_chroot_path }}:
+              {{ hostname }}:
+                ansible_user: "root"
+                ansible_connection: "chroot"
+                ansible_chroot_exe: "arch-chroot"
+                ansible_host: "{{ configure_chroot_path }}"
 
     - name: "Download playbook dependencies on live environment"
       ansible.builtin.command:
@@ -59,6 +59,8 @@
       ansible.builtin.command:
         cmd: |
           ansible-playbook site.yml
+            -i inventory/hosts.yml
+            -i inventory/chroot.yml
             --limit "{{ hostname }}"
             --extra-vars '{"hostname":"{{ hostname }}"}'
             --extra-vars "@/opt/ansible-distro-configure/group_vars/homelab.yml"
