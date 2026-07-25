@@ -30,6 +30,15 @@
   failed_when: false
   when: partition_swap.dev is defined
 
+- name: "Ensure chroot bind mounts are unmounted"
+  # arch-chroot bind-mounts /dev, /proc, /sys, /run into partition_root.mount_path.
+  # If a previous bootstrap run failed mid-chroot, these are left mounted and
+  # block unmounting the root partition below with "target is busy".
+  ansible.builtin.command:
+    cmd: "umount -R {{ partition_root.mount_path }}"
+  changed_when: true
+  failed_when: false
+
 - name: "Ensure partitions are not mounted"
   ansible.posix.mount:
     path: "{{ item.mount_path | default('') }}"
