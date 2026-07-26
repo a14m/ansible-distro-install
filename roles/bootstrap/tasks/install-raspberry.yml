@@ -29,7 +29,7 @@
 - name: "Configure apt in chroot"
   ansible.builtin.copy:
     dest: "{{ item.dest }}"
-    mode: "0640"
+    mode: "0644"
     content: "{{ item.content }}"
   loop:
     - dest: "{{ mnt_root_path }}/etc/apt/preferences.d/ignored-package"
