@@ -1,6 +1,6 @@
 ---
 bootstrap_distro:
-  name: "{{ ansible_facts['distribution_release'] }}"
+  name: "{{ ansible_facts.distribution_release }}"
   mirror_url: "http://archive.ubuntu.com/ubuntu/"
   packages:
     - "linux-generic"

@@ -6,7 +6,7 @@
     mnt_root_path: "{{ partition_root.mount_path }}"
 
 - name: "Install archlinux"
-  when: ansible_facts['os_family'] == "Archlinux"
+  when: ansible_facts.os_family == "Archlinux"
   block:
     - name: "Install archlinux"
       ansible.builtin.include_tasks: "install-archlinux.yml"
@@ -15,22 +15,22 @@
       when: bootstrap_mac
 
 - name: "Install debian"
-  when: ansible_facts['os_family'] == "Debian"
+  when: ansible_facts.os_family == "Debian"
   block:
     - name: "Install ubuntu"
       ansible.builtin.include_tasks: "install-ubuntu.yml"
-      when: ansible_facts['distribution'] == "Ubuntu"
+      when: ansible_facts.distribution == "Ubuntu"
     - name: "Install ubuntu on Mac"
       ansible.builtin.include_tasks: "install-ubuntu-mac.yml"
-      when: ansible_facts['distribution'] == "Ubuntu" and bootstrap_mac
+      when: ansible_facts.distribution == "Ubuntu" and bootstrap_mac
 
     - name: "Install raspberry"
       ansible.builtin.include_tasks: "install-raspberry.yml"
-      when: ansible_facts['distribution'] == "Debian" and bootstrap_pi
+      when: ansible_facts.distribution == "Debian" and bootstrap_pi
 
     - name: "Install proxmox"
       ansible.builtin.include_tasks: "install-proxmox.yml"
-      when: ansible_facts['distribution'] == "Debian" and bootstrap_proxmox
+      when: ansible_facts.distribution == "Debian" and bootstrap_proxmox
 
     - name: "Ensure ansible dependencies are installed in chroot"
       ansible.builtin.command:
