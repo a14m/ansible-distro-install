@@ -28,6 +28,7 @@ partition_root:
   part_start: "9.0GiB"
   part_end: "109.0GiB"
   fstype: "ext4"
+  fstype_opts: "-L ubuntu-root"
   dev: "{{ partition_disk }}p3"
   mount_path: "/mnt"
 partition_extras:

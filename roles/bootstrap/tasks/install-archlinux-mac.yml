@@ -1,23 +1,23 @@
 ---
-- name: "Find existing rEFInd NVRAM boot entries"
+- name: "Find existing Limine NVRAM boot entries"
   ansible.builtin.shell:
     cmd: |
       set -euo pipefail
-      efibootmgr | awk '/rEFInd Boot Manager/{print substr($1,5,4)}'
+      efibootmgr | awk '/Limine Boot Manager/{print substr($1,5,4)}'
     executable: /bin/bash
-  register: bootstrap_refind_boot_ids
+  register: bootstrap_limine_boot_ids
   changed_when: false
 
-- name: "Remove existing rEFInd NVRAM boot entries"
+- name: "Remove existing Limine NVRAM boot entries"
   # Rebuilt fresh below instead of updated in place, so this never accumulates
   # duplicate entries across reruns (each disk wipe changes the partition GUID
   # efibootmgr encodes, so an old entry can never just be "updated").
   ansible.builtin.command:
     cmd: "efibootmgr -b {{ item }} -B"
-  loop: "{{ bootstrap_refind_boot_ids.stdout_lines }}"
+  loop: "{{ bootstrap_limine_boot_ids.stdout_lines }}"
   changed_when: true
 
-- name: "Register rEFInd NVRAM boot entry"
+- name: "Register Limine NVRAM boot entry"
   # Explicit NVRAM entry instead of relying on Mac firmware's fallback scan of
   # EFI/BOOT/bootx64.efi, which is slow and its timing/reliability is undocumented.
   ansible.builtin.command:
@@ -26,7 +26,7 @@
       --disk {{ partition_disk }}
       --part {{ partition_boot.num }}
       --loader '\EFI\BOOT\bootx64.efi'
-      --label "rEFInd Boot Manager"
+      --label "Limine Boot Manager"
   changed_when: true
 
 - name: "Install broadcom-wl driver"

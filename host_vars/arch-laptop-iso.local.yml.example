@@ -28,6 +28,7 @@ partition_root:
   part_start: "59.0GiB"
   part_end: "109.0GiB"
   fstype: "ext4"
+  fstype_opts: "-L arch-root"
   dev: "{{ partition_disk }}4"
   mount_path: "/mnt"
 partition_extras:

@@ -18,12 +18,15 @@ argument_specs:
         type: "bool"
         required: false
         default: false
-        description: "Install broadcom-wl driver/spoof_osx (required for Intel 2012 Macs)"
+        # NOTE: rEFInd also spoofed the reported macOS version here (spoof_osx_version)
+        # for older Mac EFI firmware compatibility. Dropped in the Limine migration -
+        # no confirmed Limine equivalent, verify before relying on this description.
+        description: "Install broadcom-wl driver (required for Intel 2012 Macs)"
       bootstrap_mac_boot_args:
         type: "str"
         required: false
         default: "acpi_osi=Darwin i915.modeset=1 acpi_mask_gpe=0x06"
-        description: "Extra kernel boot arguments appended to rEFInd boot entries when bootstrap_mac is true"
+        description: "Extra kernel boot arguments appended to Limine boot entries when bootstrap_mac is true"
       bootstrap_pi:
         type: "bool"
         required: false
@@ -34,3 +37,13 @@ argument_specs:
         required: false
         default: false
         description: "Install Proxmox VE (Using Debian Live ISO since Proxmox ISO lacks automation)"
+      bootstrap_limine_version:
+        type: "str"
+        required: false
+        default: "12.5.2"
+        description: "Limine release version fetched from GitHub for both Arch and Ubuntu installs"
+      bootstrap_limine_checksum:
+        type: "str"
+        required: false
+        default: "sha256:4c760c09c53560d859b362319a3dc63b79cca3d47f35d69ab0106a13b8057055"
+        description: "Checksum for the limine-binary.tar.gz release asset matching bootstrap_limine_version"

@@ -3,3 +3,8 @@ bootstrap_mac: false
 bootstrap_mac_boot_args: "acpi_osi=Darwin i915.modeset=1 acpi_mask_gpe=0x06"
 bootstrap_pi: false
 bootstrap_proxmox: false
+# Both Arch and Ubuntu fetch the same prebuilt binary release directly from
+# upstream (no distro package for either that stays in lockstep on its own) -
+# keeps both installs on the exact same Limine version by construction.
+bootstrap_limine_version: "12.5.2"
+bootstrap_limine_checksum: "sha256:4c760c09c53560d859b362319a3dc63b79cca3d47f35d69ab0106a13b8057055"
