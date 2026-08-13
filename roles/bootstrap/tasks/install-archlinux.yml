@@ -39,6 +39,14 @@
     cmd: "arch-chroot {{ mnt_root_path }} bootctl install --esp-path=/boot/efi"
   changed_when: true
 
+- name: "Configure systemd-boot menu timeout"
+  # loader.conf lives on the shared ESP, so this also applies to any other
+  # distro dual-booted from the same disk
+  ansible.builtin.template:
+    src: "loader.conf.j2"
+    dest: "{{ mnt_boot_path }}/loader/loader.conf"
+    mode: "0644"
+
 - name: "Configure kernel command line"
   # kernel-install reads this to populate the `options` line of every entry it
   # generates (both this initial one and all future automatic ones) - without it,

@@ -37,3 +37,8 @@ argument_specs:
         required: false
         default: false
         description: "Install Proxmox VE (Using Debian Live ISO since Proxmox ISO lacks automation)"
+      bootstrap_boot_timeout:
+        type: "int"
+        required: false
+        default: 5
+        description: "systemd-boot menu timeout in seconds, written to loader.conf on the shared ESP"
