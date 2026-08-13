@@ -1,32 +1,39 @@
 ---
-- name: "Find existing rEFInd NVRAM boot entries"
+- name: "Find existing systemd-boot NVRAM boot entries"
   ansible.builtin.shell:
     cmd: |
       set -euo pipefail
-      efibootmgr | awk '/rEFInd Boot Manager/{print substr($1,5,4)}'
+      efibootmgr | awk '/systemd-boot/{print substr($1,5,4)}'
     executable: /bin/bash
-  register: bootstrap_refind_boot_ids
+  register: bootstrap_boot_ids
   changed_when: false
 
-- name: "Remove existing rEFInd NVRAM boot entries"
+- name: "Remove existing systemd-boot NVRAM boot entries"
   # Rebuilt fresh below instead of updated in place, so this never accumulates
   # duplicate entries across reruns (each disk wipe changes the partition GUID
-  # efibootmgr encodes, so an old entry can never just be "updated").
+  # efibootmgr encodes, so an old entry can never just be "updated"). NOTE: this
+  # only matches our own explicitly-labelled entry below - `bootctl install`
+  # (previous task, install-archlinux.yml) also registers its own NVRAM entry by
+  # default, which this won't touch. Check on first real boot whether that leaves
+  # a harmless-but-redundant second entry; if so, worth adding --variables=no to
+  # the `bootctl install` call to stop it registering one at all.
   ansible.builtin.command:
     cmd: "efibootmgr -b {{ item }} -B"
-  loop: "{{ bootstrap_refind_boot_ids.stdout_lines }}"
+  loop: "{{ bootstrap_boot_ids.stdout_lines }}"
   changed_when: true
 
-- name: "Register rEFInd NVRAM boot entry"
+- name: "Register systemd-boot NVRAM boot entry"
   # Explicit NVRAM entry instead of relying on Mac firmware's fallback scan of
   # EFI/BOOT/bootx64.efi, which is slow and its timing/reliability is undocumented.
+  # bootctl install also writes here (confirmed: it deploys to both
+  # EFI/systemd/systemd-bootx64.efi and this EFI/BOOT/BOOTX64.EFI fallback path).
   ansible.builtin.command:
     cmd: >
       efibootmgr --create
       --disk {{ partition_disk }}
       --part {{ partition_boot.num }}
       --loader '\EFI\BOOT\bootx64.efi'
-      --label "rEFInd Boot Manager"
+      --label "systemd-boot"
   changed_when: true
 
 - name: "Install broadcom-wl driver"
