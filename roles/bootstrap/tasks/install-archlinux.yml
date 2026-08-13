@@ -58,6 +58,28 @@
       root=PARTLABEL={{ partition_root.name }} rw console=tty1 {{
       bootstrap_mac_boot_args if bootstrap_mac else '' }}
 
+- name: "Set deterministic machine-id"
+  ansible.builtin.set_fact:
+    bootstrap_machine_id: "{{ ansible_facts.distribution | hash('md5') }}"
+
+- name: "Pin machine-id in chroot"
+  # pacstrap seeds its own /etc/machine-id, so kernel-install would otherwise
+  # generate a new random one per reinstall - producing a brand new (never
+  # cleaned up) boot entry filename every time, since the ESP itself isn't
+  # wiped between reinstalls (see partition_wipe). Pinning it lets the
+  # cleanup task below target this distro's old entries.
+  ansible.builtin.copy:
+    dest: "{{ mnt_root_path }}/etc/machine-id"
+    mode: "0444"
+    content: "{{ bootstrap_machine_id }}"
+
+- name: "Remove stale boot entries from previous installs"
+  ansible.builtin.command:
+    cmd: >
+      find {{ mnt_boot_path }}/loader/entries -maxdepth 1
+      -name "{{ bootstrap_machine_id }}-*.conf" -delete
+  changed_when: true
+
 - name: "Create initial boot entry for the already-installed kernel"
   # kernel-install's pacman hook (shipped by mkinitcpio) only fires automatically on
   # FUTURE kernel updates - the kernel pacstrap already installed predates
