@@ -25,7 +25,10 @@ argument_specs:
       bootstrap_boot_args:
         type: "str"
         required: true
-        description: "Extra kernel boot arguments appended to /etc/kernel/cmdline (e.g. mac-specific args, pcie_aspm=off for boards with ASPM wake bugs) - set per host in host_vars, no default"
+        description: >-
+          Extra kernel boot arguments appended to /etc/kernel/cmdline
+          (e.g. mac-specific args, pcie_aspm=off for boards with ASPM wake bugs),
+          set per host in host_vars, no default
       bootstrap_pi:
         type: "bool"
         required: false
@@ -46,4 +49,14 @@ argument_specs:
         elements: "str"
         required: false
         default: []
-        description: "Kernel modules to blacklist via /etc/modprobe.d on the installed system (e.g. a failing wifi card's driver)"
+        description: >-
+          Kernel modules to blacklist via /etc/modprobe.d on the installed system
+          (e.g. a failing wifi card's driver)
+      bootstrap_disable_usb_devices:
+        type: "list"
+        elements: "str"
+        required: false
+        default: []
+        description: >-
+          USB devices to disable via udev on the installed system, as \"idVendor:idProduct\" strings,
+          matching lsusb's ID column (e.g. a failing combo card's Bluetooth interface)

@@ -49,3 +49,12 @@
     mode: "0644"
     content: "blacklist {{ item }}\n"
   loop: "{{ bootstrap_blacklist_modules }}"
+
+- name: "Disable USB devices"
+  ansible.builtin.copy:
+    dest: "{{ mnt_root_path }}/etc/udev/rules.d/99-disable-{{ item | replace(':', '-') }}.rules"
+    mode: "0644"
+    content: >
+      ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="{{ item.split(':')[0] }}",
+      ATTR{idProduct}=="{{ item.split(':')[1] }}", ATTR{authorized}="0"
+  loop: "{{ bootstrap_disable_usb_devices }}"

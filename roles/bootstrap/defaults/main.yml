@@ -4,3 +4,4 @@ bootstrap_pi: false
 bootstrap_proxmox: false
 bootstrap_boot_timeout: 5
 bootstrap_blacklist_modules: []
+bootstrap_disable_usb_devices: []
