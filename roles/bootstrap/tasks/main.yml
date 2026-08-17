@@ -42,3 +42,10 @@
     dest: "{{ mnt_root_path }}/etc/hostname"
     mode: "0644"
     content: "{{ hostname }}"
+
+- name: "Blacklist kernel modules"
+  ansible.builtin.copy:
+    dest: "{{ mnt_root_path }}/etc/modprobe.d/{{ item }}-blacklist.conf"
+    mode: "0644"
+    content: "blacklist {{ item }}\n"
+  loop: "{{ bootstrap_blacklist_modules }}"

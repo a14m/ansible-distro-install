@@ -33,3 +33,17 @@ ip link
 iwctl --passphrase <PASSPHRASE> station wlan0 connect <SSID>
 dhcpcd wlan0
 ```
+
+Note: on `desktop.local`, the onboard QCA6174 wifi (`ath10k_pci`) has a confirmed hardware fault
+it's blacklisted on the installed system via `bootstrap_blacklist_modules`.
+
+Instead an old WIFI adapter is used instead, but because it can only work with the 2.4GHz band,
+the download speed is limited, and to avoid extra instabilities, the IPv6 is disabled on the interface.
+
+```bash
+modprobe -r ath10k_pci
+modprobe rtl8187
+ip link
+ethtool -i wlan0
+sysctl -w net.ipv6.conf.wlan0.disable_ipv6=1
+```

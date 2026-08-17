@@ -45,4 +45,5 @@ partition_extras:
     dev: "{{ partition_disk }}5"
     mount_path: "/mnt/home"
 bootstrap_mac: true
+bootstrap_boot_args: "acpi_osi=Darwin i915.modeset=1 acpi_mask_gpe=0x06 pcie_aspm=off"
 configure_playbook_dir: "../ansible-distro-configure"

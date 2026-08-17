@@ -38,4 +38,6 @@ partition_extras:
     fstype: "ext4"
     dev: "{{ partition_disk }}p4"
     mount_path: "/mnt/home"
+bootstrap_boot_args: "pcie_aspm=off"
+bootstrap_blacklist_modules: ["ath10k_pci"]
 configure_playbook_dir: "../ansible-distro-configure"
