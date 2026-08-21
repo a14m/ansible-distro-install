@@ -25,6 +25,7 @@ jobs:
           ansible-lint
 
   playbook:
+    name: "${{ matrix.molecule_distro.distro }}"
     strategy:
       fail-fast: false
       matrix:
