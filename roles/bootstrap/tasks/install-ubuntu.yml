@@ -132,3 +132,17 @@
       /boot/vmlinuz-{{ item }}
   loop: "{{ bootstrap_kernel_versions.stdout_lines }}"
   changed_when: true
+
+- name: "Ensure custom kernel postinst hooks directory exists"
+  ansible.builtin.file:
+    path: "{{ mnt_root_path }}/etc/kernel/postinst.d"
+    state: "directory"
+    mode: "0755"
+
+- name: "Install postinst hook to keep boot entries in sync with kernel upgrades"
+  # UNVERIFIED: assumed necessary by analogy with Arch (install-archlinux.yml)
+  # Safe no-op if wrong.
+  ansible.builtin.copy:
+    src: "zz-kernel-install"
+    dest: "{{ mnt_root_path }}/etc/kernel/postinst.d/zz-kernel-install"
+    mode: "0755"

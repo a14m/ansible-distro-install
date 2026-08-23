@@ -80,15 +80,27 @@
   changed_when: true
 
 - name: "Create initial boot entry for the already-installed kernel"
-  # kernel-install's pacman hook (shipped by mkinitcpio) only fires automatically on
-  # FUTURE kernel updates - the kernel pacstrap already installed predates
-  # `bootctl install`/loader.conf existing, so nothing auto-triggered for it yet.
-  # add-all requires the kernel image under /usr/lib/modules/<version>/vmlinuz; if
-  # that's not satisfied, fall back to the explicit
-  # `kernel-install add <version> /boot/vmlinuz-linux` form instead.
+  # CONFIRMED (see the following two tasks): mkinitcpio's pacman hook never
+  # calls kernel-install, so nothing auto-triggers this even once.
   ansible.builtin.command:
     cmd: "arch-chroot {{ mnt_root_path }} kernel-install add-all"
   changed_when: true
+
+- name: "Ensure custom pacman hooks directory exists"
+  ansible.builtin.file:
+    path: "{{ mnt_root_path }}/etc/pacman.d/hooks"
+    state: "directory"
+    mode: "0755"
+
+- name: "Install pacman hook to keep boot entries in sync with kernel upgrades"
+  # confirmed on a live system: mkinitcpio's own pacman hook only rebuilds the
+  # legacy /boot/vmlinuz-linux image, it never calls kernel-install - so
+  # without this, the BLS entries created above go stale on the very next
+  # kernel upgrade and the system won't boot the new kernel.
+  ansible.builtin.copy:
+    src: "91-kernel-install.hook"
+    dest: "{{ mnt_root_path }}/etc/pacman.d/hooks/91-kernel-install.hook"
+    mode: "0644"
 
 - name: "Ensure ansible dependencies are installed in chroot"
   ansible.builtin.command:
