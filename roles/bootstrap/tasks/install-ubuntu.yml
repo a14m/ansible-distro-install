@@ -146,3 +146,17 @@
     src: "zz-kernel-install"
     dest: "{{ mnt_root_path }}/etc/kernel/postinst.d/zz-kernel-install"
     mode: "0755"
+
+- name: "Ensure custom kernel postrm hooks directory exists"
+  ansible.builtin.file:
+    path: "{{ mnt_root_path }}/etc/kernel/postrm.d"
+    state: "directory"
+    mode: "0755"
+
+- name: "Install postrm hook to prune boot entries on kernel removal"
+  # UNVERIFIED: assumed necessary by analogy with Arch (install-archlinux.yml).
+  # Safe no-op if wrong.
+  ansible.builtin.copy:
+    src: "zz-kernel-install-remove"
+    dest: "{{ mnt_root_path }}/etc/kernel/postrm.d/zz-kernel-install"
+    mode: "0755"
