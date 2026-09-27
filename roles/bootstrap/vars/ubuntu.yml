@@ -4,6 +4,8 @@ bootstrap_distro:
   mirror_url: "http://archive.ubuntu.com/ubuntu/"
   packages:
     - "linux-generic"
+    # Only a Recommends of linux-image; install explicitly so /boot/initrd.img-<version> always exists.
+    - "initramfs-tools"
 
 bootstrap_opts: ""
 
