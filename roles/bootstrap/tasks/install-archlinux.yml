@@ -80,8 +80,7 @@
   changed_when: true
 
 - name: "Create initial boot entry for the already-installed kernel"
-  # CONFIRMED (see the following two tasks): mkinitcpio's pacman hook never
-  # calls kernel-install, so nothing auto-triggers this even once.
+  # The kernel pacstrap installed predates `bootctl install`, so nothing created its entry yet.
   ansible.builtin.command:
     cmd: "arch-chroot {{ mnt_root_path }} kernel-install add-all"
   changed_when: true
@@ -93,25 +92,32 @@
     mode: "0755"
 
 - name: "Install kernel-install sync/prune script"
-  # kernel-install add-all only ever adds entries - it never removes ones for
-  # kernel versions pacman has already deleted from /usr/lib/modules/, so a
-  # small ESP fills up with stale entries over a few kernel upgrades and the
-  # next kernel-install add then silently fails, leaving the system unable
-  # to boot the newly installed kernel.
+  # kernel-install add-all never removes entries for kernels pacman already deleted from /usr/lib/modules/,
+  # so the 1GiB ESP fills up and the next add fails; prune this machine-id's stale entries before adding.
   ansible.builtin.copy:
     src: "kernel-install-sync"
     dest: "{{ mnt_root_path }}/usr/local/bin/kernel-install-sync"
     mode: "0755"
 
-- name: "Install pacman hook to keep boot entries in sync with kernel upgrades"
-  # confirmed on a live system: mkinitcpio's own pacman hook only rebuilds the
-  # legacy /boot/vmlinuz-linux image, it never calls kernel-install - so
-  # without this, the BLS entries created above go stale on the very next
-  # kernel upgrade and the system won't boot the new kernel.
+- name: "Install pacman hook to keep boot entries in sync with kernel/initramfs input changes"
+  # Arch ships no kernel-install pacman hook, so without this kernel upgrades never reach the ESP.
+  # Triggers copied from mkinitcpio 42's 90-mkinitcpio-install.hook, so nvidia/firmware/modprobe.d
+  # upgrades rebuild the ESP initrd too.
   ansible.builtin.copy:
     src: "91-kernel-install.hook"
     dest: "{{ mnt_root_path }}/etc/pacman.d/hooks/91-kernel-install.hook"
     mode: "0644"
+
+- name: "Mask mkinitcpio pacman hooks"
+  # They only build/remove /boot/*-linux images that systemd-boot never reads; kernel-install builds the ESP initrd.
+  ansible.builtin.file:
+    src: "/dev/null"
+    dest: "{{ mnt_root_path }}/etc/pacman.d/hooks/{{ item }}"
+    state: "link"
+    force: true
+  loop:
+    - "60-mkinitcpio-remove.hook"
+    - "90-mkinitcpio-install.hook"
 
 - name: "Ensure ansible dependencies are installed in chroot"
   ansible.builtin.command:

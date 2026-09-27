@@ -120,43 +120,13 @@
   changed_when: false
 
 - name: "Create initial boot entry for the already-installed kernel"
-  # kernel-install's hook only fires automatically on FUTURE kernel updates - the
-  # kernel debootstrap already installed predates `bootctl install`/loader.conf
-  # existing, so nothing auto-triggered for it yet.
-  # Also unverified: whether apt's kernel postinst auto-invokes kernel-install for
-  # future updates the way mkinitcpio's pacman hook does on Arch - confirm on the
-  # actual install target before relying on it being fully hands-off long-term.
+  # The kernel debootstrap installed predates `bootctl install`, so nothing created its entry yet.
+  # Later kernel installs/removals and initramfs updates are synced by the systemd-boot package's own
+  # /etc/kernel/postinst.d, postrm.d and /etc/initramfs/post-update.d hooks.
+  # kernel-install never looks for Debian's /boot/initrd.img-<version> itself, so pass it explicitly.
   ansible.builtin.command:
     cmd: >
       arch-chroot {{ mnt_root_path }} kernel-install add {{ item }}
-      /boot/vmlinuz-{{ item }}
+      /boot/vmlinuz-{{ item }} /boot/initrd.img-{{ item }}
   loop: "{{ bootstrap_kernel_versions.stdout_lines }}"
   changed_when: true
-
-- name: "Ensure custom kernel postinst hooks directory exists"
-  ansible.builtin.file:
-    path: "{{ mnt_root_path }}/etc/kernel/postinst.d"
-    state: "directory"
-    mode: "0755"
-
-- name: "Install postinst hook to keep boot entries in sync with kernel upgrades"
-  # UNVERIFIED: assumed necessary by analogy with Arch (install-archlinux.yml)
-  # Safe no-op if wrong.
-  ansible.builtin.copy:
-    src: "zz-kernel-install"
-    dest: "{{ mnt_root_path }}/etc/kernel/postinst.d/zz-kernel-install"
-    mode: "0755"
-
-- name: "Ensure custom kernel postrm hooks directory exists"
-  ansible.builtin.file:
-    path: "{{ mnt_root_path }}/etc/kernel/postrm.d"
-    state: "directory"
-    mode: "0755"
-
-- name: "Install postrm hook to prune boot entries on kernel removal"
-  # UNVERIFIED: assumed necessary by analogy with Arch (install-archlinux.yml).
-  # Safe no-op if wrong.
-  ansible.builtin.copy:
-    src: "zz-kernel-install-remove"
-    dest: "{{ mnt_root_path }}/etc/kernel/postrm.d/zz-kernel-install"
-    mode: "0755"
