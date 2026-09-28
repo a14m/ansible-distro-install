@@ -27,9 +27,14 @@
 
 - name: "Download Proxmox repo signing key"
   ansible.builtin.get_url:
-    url: "https://enterprise.proxmox.com/debian/proxmox-release-bookworm.gpg"
-    dest: "{{ mnt_root_path }}/etc/apt/trusted.gpg.d/proxmox-release-bookworm.gpg"
+    url: "{{ bootstrap_proxmox_keyring_url }}"
+    dest: "{{ mnt_root_path }}{{ bootstrap_proxmox_keyring_path }}"
     mode: "0644"
+
+- name: "Remove debootstrap generated sources.list (replaced by deb822 sources)"
+  ansible.builtin.file:
+    path: "{{ mnt_root_path }}/etc/apt/sources.list"
+    state: "absent"
 
 - name: "Configure apt in chroot"
   ansible.builtin.copy:
@@ -37,9 +42,9 @@
     mode: "0644"
     content: "{{ item.content }}"
   loop:
-    - dest: "{{ mnt_root_path }}/etc/apt/sources.list"
+    - dest: "{{ mnt_root_path }}/etc/apt/sources.list.d/debian.sources"
       content: "{{ bootstrap_apt_sources }}"
-    - dest: "{{ mnt_root_path }}/etc/apt/sources.list.d/pve-no-subscription.list"
+    - dest: "{{ mnt_root_path }}/etc/apt/sources.list.d/proxmox.sources"
       content: "{{ bootstrap_proxmox_apt_sources }}"
 
 - name: "Configure system in chroot"
