@@ -8,7 +8,7 @@ ENV container docker
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        systemd python3 parted dosfstools \
+        systemd python3 parted dosfstools e2fsprogs \
     && rm -Rf /var/lib/apt/lists/* \
     && rm -Rf /usr/share/doc \
     && rm -Rf /usr/share/man \
