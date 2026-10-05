@@ -7,7 +7,7 @@ name: "CI"
     - cron: '0 12 * * 5'
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
@@ -32,19 +32,19 @@ jobs:
         molecule_distro:
           - distro: archlinux
             platform: "linux/amd64"
-            runs_on: "ubuntu-latest"
+            runs_on: "ubuntu-26.04"
           - distro: ubuntu-noble
             platform: "linux/amd64"
-            runs_on: "ubuntu-latest"
+            runs_on: "ubuntu-26.04"
           - distro: ubuntu-resolute
             platform: "linux/amd64"
-            runs_on: "ubuntu-latest"
+            runs_on: "ubuntu-26.04"
           - distro: proxmox
             platform: "linux/amd64"
-            runs_on: "ubuntu-latest"
+            runs_on: "ubuntu-26.04"
           - distro: raspberrypi
             platform: "linux/arm64/v8"
-            runs_on: "ubuntu-24.04-arm"
+            runs_on: "ubuntu-26.04-arm"
     runs-on: ${{ matrix.molecule_distro.runs_on }}
     steps:
       - uses: actions/checkout@v6
