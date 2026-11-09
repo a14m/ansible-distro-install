@@ -8,16 +8,17 @@
 - Connect to wireless network (if not connected via LAN)
 - Set root password (which will be asked to run the install playbook)
 - Wipe FS and remove LVM signatures if any (to release the partitions for the playbook).
-- Set the host name `proxmox-iso.local`
+- Set the host name `proxmox-<MACHINE>-iso.local`
 - Install and configure ssh
-- `cp host_vars/proxmox-iso.local.example host_vars/proxmox-iso.local`
-- Update the `host_vars/proxmox-iso.local` file
+- `cp host_vars/proxmox-<MACHINE>-iso.local.yml.example host_vars/proxmox-<MACHINE>-iso.local.yml`
+- Update the `host_vars/proxmox-<MACHINE>-iso.local.yml` file
 - Run the playbook on the ansible controller
 
 **Example:**
 
 ```bash
-sudo hostnamectl set-hostname proxmox-iso
+sudo date -u -s "YYYY-MM-DD HH:MM:SS"
+sudo hostnamectl set-hostname proxmox-<MACHINE>-iso
 sudo passwd user
 nmcli dev wifi connect <SSID> password <PASSPHRASE>
 sudo apt update
@@ -28,7 +29,3 @@ sudo wipefs -af /dev/sda?
 sudo /sbin/vgchange -an
 sudo /sbin/dmsetup remove_all --force
 ```
-
-**Mac Example:**
-
-Not supported.

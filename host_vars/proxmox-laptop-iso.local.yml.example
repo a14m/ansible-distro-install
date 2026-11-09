@@ -1,5 +1,5 @@
 ---
-hostname: "pve.local"
+hostname: "pve-01.local"
 bootstrap_proxmox: true
 partition_disk: "/dev/sda"
 partition_wipe: true
