@@ -6,16 +6,16 @@
     distro_key: "{{ lookup('ansible.builtin.env', 'MOLECULE_DISTRO') }}"
     scenario_vars:
       archlinux:
-        hostname: "desktop.local"
+        hostname: "desktop"
       ubuntu-noble:
-        hostname: "laptop.local"
+        hostname: "laptop"
       ubuntu-resolute:
-        hostname: "laptop.local"
+        hostname: "laptop"
       raspberrypi:
-        hostname: "rpi5.local"
+        hostname: "rpi5"
         bootstrap_pi: true
       proxmox:
-        hostname: "pve.local"
+        hostname: "pve-01"
         bootstrap_proxmox: true
   tasks:
     - name: "Find loop device for vdd.img"

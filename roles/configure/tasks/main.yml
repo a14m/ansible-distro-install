@@ -44,7 +44,7 @@
         content: |
           homelab:
             hosts:
-              {{ hostname }}:
+              {{ hostname }}.lan:
                 ansible_user: "root"
                 ansible_connection: "chroot"
                 ansible_chroot_exe: "arch-chroot"
@@ -61,7 +61,7 @@
           ansible-playbook site.yml
             -i inventory/hosts.yml
             -i inventory/chroot.yml
-            --limit "{{ hostname }}"
+            --limit "{{ hostname }}.lan"
             --extra-vars '{"hostname":"{{ hostname }}"}'
             --tags 'required_for_boot'
         chdir: "/opt/ansible-distro-configure"

@@ -17,7 +17,7 @@ with your own version.
 
 If you are not using `git-crypt`, delete the `.gitattributes` file and override the encrypted files
 with your own version.<br>
-Ex. `rm .gitattributes && cp host_vars/ubuntu-desktop-iso.local.yml.example host_vars/ubuntu-desktop-iso.local.yml`
+Ex. `rm .gitattributes && cp host_vars/ubuntu-desktop-iso.lan.yml.example host_vars/ubuntu-desktop-iso.lan.yml`
 
 ## Boot distro live image
 
@@ -37,13 +37,13 @@ Ex. `rm .gitattributes && cp host_vars/ubuntu-desktop-iso.local.yml.example host
 
 ```bash
 git clone https://git.sr.ht/~a14m/ansible-distro-install /opt/distro-install
-cp /opt/distro-install/host_vars/${DISTRO}-${MACHINE}-iso.local.yml.example \
-  /opt/distro-install/host_vars/${DISTRO}-${MACHINE}-iso.local.yml
+cp /opt/distro-install/host_vars/${DISTRO}-${MACHINE}-iso.lan.yml.example \
+  /opt/distro-install/host_vars/${DISTRO}-${MACHINE}-iso.lan.yml
 
 cd /opt/distro-install
 ansible-galaxy install -r requirements.yml
 
-ansible-playbook site.yml --ask-pass --limit ${DISTRO}-${MACHINE}-iso.local
+ansible-playbook site.yml --ask-pass --limit ${DISTRO}-${MACHINE}-iso.lan
 ```
 
 ## Playbook: distro-configure
@@ -56,16 +56,16 @@ ansible-playbook site.yml --ask-pass --limit ${DISTRO}-${MACHINE}-iso.local
 
 ```bash
 git clone https://git.sr.ht/~a14m/ansible-distro-install /opt/distro-install
-cp /opt/distro-install/host_vars/${DISTRO}-${MACHINE}-iso.local.yml.example \
-  /opt/distro-install/host_vars/${DISTRO}-${MACHINE}-iso.local.yml
+cp /opt/distro-install/host_vars/${DISTRO}-${MACHINE}-iso.lan.yml.example \
+  /opt/distro-install/host_vars/${DISTRO}-${MACHINE}-iso.lan.yml
 
 git clone https://git.sr.ht/~a14m/ansible-distro-configure /opt/distro-configure
-cp /opt/distro-configure/host_vars/${HOSTNAME}.yml.example /opt/distro-configure/host_vars/${HOSTNAME}.yml
+cp /opt/distro-configure/host_vars/${HOSTNAME}.lan.yml.example /opt/distro-configure/host_vars/${HOSTNAME}.lan.yml
 
 cd /opt/distro-install
 ansible-galaxy install -r requirements.yml
 
-ansible-playbook site.yml --ask-pass --limit ${DISTRO}-${MACHINE}-iso.local \
+ansible-playbook site.yml --ask-pass --limit ${DISTRO}-${MACHINE}-iso.lan \
   --extra-vars '{"hostname": "${HOSTNAME}", "configure_playbook_dir":"/opt/distro-configure"}'
 ```
 

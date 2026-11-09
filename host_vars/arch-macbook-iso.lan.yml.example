@@ -1,5 +1,5 @@
 ---
-hostname: "laptop.local"
+hostname: "macbook"
 partition_disk: "/dev/sda"
 partition_wipe: false
 partition_boot:
@@ -23,20 +23,20 @@ partition_swap:
   dev: "{{ partition_disk }}2"
   mount_path: "none"
 partition_root:
-  num: 3
-  name: "ubuntu-root"
-  part_start: "9.0GiB"
-  part_end: "59.0GiB"
+  num: 4
+  name: "arch-root"
+  part_start: "59.0GiB"
+  part_end: "109.0GiB"
   fstype: "ext4"
-  dev: "{{ partition_disk }}3"
+  dev: "{{ partition_disk }}4"
   mount_path: "/mnt"
 partition_extras:
-  - num: 4
-    name: "arch-root"
-    part_start: "59.0GiB"
-    part_end: "109.0GiB"
+  - num: 3
+    name: "ubuntu-root"
+    part_start: "9.0GiB"
+    part_end: "59.0GiB"
     fstype: "ext4"
-    dev: "{{ partition_disk }}4"
+    dev: "{{ partition_disk }}3"
   - num: 5
     name: "home"
     part_start: "109.0GiB"
@@ -44,5 +44,6 @@ partition_extras:
     fstype: "ext4"
     dev: "{{ partition_disk }}5"
     mount_path: "/mnt/home"
-bootstrap_boot_args: ""
+bootstrap_mac: true
+bootstrap_boot_args: "acpi_osi=Darwin i915.modeset=1 acpi_mask_gpe=0x06 pcie_aspm=off"
 configure_playbook_dir: "../ansible-distro-configure"

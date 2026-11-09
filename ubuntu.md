@@ -7,10 +7,10 @@
 - Boot the `ubuntu` live image from a bootable USB
 - Connect to wireless network (if not connected via LAN)
 - Set root password (which will be asked to run the install playbook)
-- Set the host name `ubuntu-<MACHINE>-iso.local`
+- Set the host name `ubuntu-<MACHINE>-iso` (the DHCP server registers it as `ubuntu-<MACHINE>-iso.lan`)
 - Install and configure ssh
-- `cp host_vars/ubuntu-<MACHINE>-iso.local.example host_vars/ubuntu-<MACHINE>-iso.local`
-- Update the `host_vars/ubuntu-<MACHINE>-iso.local` file
+- `cp host_vars/ubuntu-<MACHINE>-iso.lan.yml.example host_vars/ubuntu-<MACHINE>-iso.lan.yml`
+- Update the `host_vars/ubuntu-<MACHINE>-iso.lan.yml` file
 - Run the playbook on the ansible controller
 
 **Example:**

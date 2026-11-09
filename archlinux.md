@@ -6,17 +6,17 @@
 - Create bootable image from iso `sudo dd if=/path/to/image.iso of=/dev/diskX bs=4M status=progress`
 - Boot the `archiso` live image from a bootable USB.
 - Set root password (which will be asked to run the install playbook).
-- Set the host name `arch-<MACHINE>-iso.local`
+- Set the host name `arch-<MACHINE>-iso` (the DHCP server registers it as `arch-<MACHINE>-iso.lan`)
 - Reload `boradcom-wl` module on Mac.
 - Connect to wireless network (if not connected via LAN).
-- `cp host_vars/arch-<MACHINE>-iso.local.example host_vars/arch-<MACHINE>-iso.local`
-- Update the `host_vars/arch-<MACHINE>-iso.local` file
+- `cp host_vars/arch-<MACHINE>-iso.lan.yml.example host_vars/arch-<MACHINE>-iso.lan.yml`
+- Update the `host_vars/arch-<MACHINE>-iso.lan.yml` file
 - Run the playbook on the ansible controller.
 
 **Generic Example:**
 
 ```bash
-hostnamectl set-hostname arch-<MACHINE>-iso.local
+hostnamectl set-hostname arch-<MACHINE>-iso
 passwd
 iwctl --passphrase <PASSPHRASE> station wlan0 connect <SSID>
 dhcpcd wlan0
@@ -25,7 +25,7 @@ dhcpcd wlan0
 **Mac Example:**
 
 ```bash
-hostnamectl set-hostname arch-macbook-iso.local
+hostnamectl set-hostname arch-macbook-iso
 passwd
 rmmod b43 ssb bcma wl
 modprobe wl

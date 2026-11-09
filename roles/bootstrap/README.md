@@ -15,12 +15,12 @@ This role bootstraps the installation of a linux distro
 ## Dual Booting
 
 The role is configure for allowing dual boot multiple distros.
-For example, the following `archiso.local` and `ubuntuiso.local` diff shows how to do that
+For example, the following `arch-laptop-iso.lan` and `ubuntu-laptop-iso.lan` diff shows how to do that
 
 ```diff
-+ hostname: "archlinux.local"
++ hostname: "archlinux"
 + partition_wipe: true
-- hostname: "ubuntuiso.local"
+- hostname: "ubuntu"
 - partition_wipe: false
   partition_disk: "/dev/sda"
   partition_boot:

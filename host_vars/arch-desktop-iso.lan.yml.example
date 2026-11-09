@@ -1,7 +1,6 @@
 ---
-hostname: "pve-01.local"
-bootstrap_proxmox: true
-partition_disk: "/dev/sda"
+hostname: "desktop"
+partition_disk: "/dev/nvme0n1"
 partition_wipe: true
 partition_boot:
   num: 1
@@ -11,7 +10,7 @@ partition_boot:
   part_end: "1.0GiB"
   fstype: "vfat"
   fstype_opts: "-F 32"
-  dev: "{{ partition_disk }}1"
+  dev: "{{ partition_disk }}p1"
   mount_path: "/mnt/boot/efi"
   fstab_opts: "defaults,nodev,nosuid,noexec,umask=0077"
 partition_swap:
@@ -21,22 +20,25 @@ partition_swap:
   part_start: "1.0GiB"
   part_end: "9.0GiB"
   fstype: "ext4"
-  dev: "{{ partition_disk }}2"
+  dev: "{{ partition_disk }}p2"
   mount_path: "none"
 partition_root:
   num: 3
-  name: "pve-root"
-  part_start: "69.0GiB"
-  part_end: "100%"
+  name: "arch-root"
+  part_start: "9.0GiB"
+  part_end: "109.0GiB"
   fstype: "ext4"
-  dev: "{{ partition_disk }}3"
+  dev: "{{ partition_disk }}p3"
   mount_path: "/mnt"
 partition_extras:
   - num: 4
-    name: "pve-data"
-    flags: ["LVM"]
-    part_start: "69.0GiB"
+    name: "home"
+    part_start: "109.0GiB"
     part_end: "100%"
-    fstype: "lvm"
-    dev: "{{ partition_disk }}4"
+    fstype: "ext4"
+    dev: "{{ partition_disk }}p4"
+    mount_path: "/mnt/home"
+bootstrap_boot_args: "pcie_aspm=off"
+bootstrap_blacklist_modules: ["ath10k_pci"]
+bootstrap_disable_usb_devices: ["0b05:1825"]
 configure_playbook_dir: "../ansible-distro-configure"

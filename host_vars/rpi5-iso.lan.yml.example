@@ -1,5 +1,5 @@
 ---
-hostname: "rpi5.local"
+hostname: "rpi5"
 partition_disk: "/dev/mmcblk0"
 partition_wipe: true
 partition_boot:
