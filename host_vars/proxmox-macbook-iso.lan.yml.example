@@ -1,7 +1,7 @@
 ---
 hostname: "pve-02"
 bootstrap_proxmox: true
-bootstrap_boot_args: ""
+bootstrap_boot_args: "acpi_osi=Darwin"
 partition_disk: "/dev/sda"
 partition_wipe: true
 partition_boot:
