@@ -2,6 +2,12 @@
 - name: "Distro Install"
   hosts: all
   become: true
+  pre_tasks:
+    - name: "Prevent the live ISO from sleeping during the install"
+      ansible.builtin.systemd_service:
+        name: "{{ item }}"
+        masked: true
+      loop: ["sleep.target", "suspend.target", "hibernate.target", "hybrid-sleep.target"]
   roles:
     - role: "partition"
     - role: "bootstrap"
