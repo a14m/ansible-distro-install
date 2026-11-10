@@ -77,6 +77,13 @@
   # NOTE: --no-nvram used because NVRAM is not writable inside chroot
   tags: ["molecule-notest"]
 
+- name: "Set kernel boot args"
+  ansible.builtin.copy:
+    dest: "{{ mnt_root_path }}/etc/default/grub.d/boot-args.cfg"
+    mode: "0644"
+    content: |
+      GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT {{ bootstrap_boot_args }}"
+
 - name: "Generate grub configuration"
   ansible.builtin.command:
     cmd: "arch-chroot {{ mnt_root_path }} update-grub"

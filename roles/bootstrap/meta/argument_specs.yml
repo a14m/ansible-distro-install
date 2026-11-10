@@ -26,7 +26,8 @@ argument_specs:
         type: "str"
         required: true
         description: >-
-          Extra kernel boot arguments appended to /etc/kernel/cmdline
+          Extra kernel boot arguments appended to the kernel command line
+          (bootloader entry, or GRUB_CMDLINE_LINUX_DEFAULT on Proxmox)
           (e.g. mac-specific args, pcie_aspm=off for boards with ASPM wake bugs),
           set per host in host_vars, no default
       bootstrap_pi:
